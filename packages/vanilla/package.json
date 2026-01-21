@@ -39,8 +39,6 @@
 	},
 	"scripts": {
 		"build": "vite build --config vite.config.ts",
-		"dev": "vite build --config vite.config.ts --watch",
-		"copy-artifacts": "node scripts/copy-artifacts.js",
-		"prepublishOnly": "npm run build && npm run copy-artifacts"
+		"dev": "vite build --config vite.config.ts --watch"
 	}
 }
