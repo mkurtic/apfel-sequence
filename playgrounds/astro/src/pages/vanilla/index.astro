@@ -1,0 +1,36 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+<Layout>
+  <section id="hero">
+		<div id="canvas-container">
+  		<canvas class="scroll-sequence" id="canvas"></canvas>
+    </div>
+  </section>
+  <section id="section-2">
+		<div id="canvas-container-2">
+  		<canvas class="scroll-sequence" id="canvas-2"></canvas>
+    </div>
+  </section>
+  <section></section>
+</Layout>
+<script>
+import ScrollSequence from "scroll-sequence";
+import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
+
+const scrollSequenceHero = ScrollSequence({
+  canvas: document.querySelector("#canvas"),
+  container: document.querySelector("#canvas-container"),
+  assetsConfigs: heroAssets,
+  loadingConfig: heroLoadingConfig,
+});
+
+  
+const scrollSequenceSection2 = ScrollSequence({
+  canvas: document.querySelector("#canvas-2"),
+  container: document.querySelector("#canvas-container-2"),
+  assetsConfigs: section2Assets,
+  loadingConfig: section2LoadingConfig,
+  scrollConfig: section2ScrollConfig,
+});
+</script>

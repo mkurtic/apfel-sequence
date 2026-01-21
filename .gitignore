@@ -1,0 +1,12 @@
+node_modules/
+/dist
+/packages/angular/dist
+/packages/react/dist
+/packages/core/dist
+/packages/vanilla/dist
+/packages/vue/dist
+/packages/node_modules
+
+**/.vscode/
+.astro/
+.DS_Store

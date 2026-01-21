@@ -1,0 +1,57 @@
+{
+	"name": "scroll-sequence-monorepo",
+	"private": true,
+	"author": "Mehmed Kurtic",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mkurtic/scroll-sequence.git"
+	},
+	"bugs": {
+		"url": "https://github.com/mkurtic/scroll-sequence/issues"
+	},
+	"homepage": "https://github.com/mkurtic/scroll-sequence#readme",
+	"keywords": [
+		"scroll-sequence",
+		"canvas",
+		"animation",
+		"scroll-trigger",
+		"gsap",
+		"image-sequence",
+		"performance"
+	],
+	"workspaces": [
+		"packages/*",
+		"playgrounds/astro"
+	],
+	"scripts": {
+		"build:core": "npm run build -w @scroll-sequence/core",
+		"build:vanilla": "npm exec -- vite build --config packages/vanilla/vite.config.ts",
+		"build:react": "vite build --config packages/react/vite.config.ts",
+		"build:vue": "npm exec -- vite build --config packages/vue/vite.config.ts",
+		"build:all": "npm run build:core && npm run build:vanilla && npm run build:react && npm run build:vue",
+		"dev:core": "npm run dev -w @scroll-sequence/core",
+		"dev:vanilla": "npm run dev -w @scroll-sequence/vanilla",
+		"dev:react": "npm run dev -w @scroll-sequence/react",
+		"dev:vue": "npm run dev -w @scroll-sequence/vue",
+		"dev": "concurrently \"npm run dev:core\" \"npm run dev:vanilla\" \"npm run dev:react\" \"npm run dev:vue\"",
+		"test": "vitest run --config packages/core/vitest.config.mts --reporter=verbose --pool=forks",
+		"test:watch": "vitest --config packages/core/vitest.config.mts --watch",
+		"release": "npm run build:all && changeset publish"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.29.8",
+		"@vitejs/plugin-react": "^4.0.0",
+		"@vitejs/plugin-vue": "^5.0.0",
+		"concurrently": "^9.2.1",
+		"jsdom": "^27.4.0",
+		"tsup": "^7.0.0",
+		"typescript": "^5.0.0",
+		"vite": "^5.0.0",
+		"vite-plugin-dts": "^4.5.4",
+		"vitest": "^4.0.16"
+	},
+	"dependencies": {
+		"gsap": "^3.14.2"
+	}
+}

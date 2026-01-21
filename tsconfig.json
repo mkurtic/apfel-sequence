@@ -1,0 +1,30 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"jsx": "preserve",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"useUnknownInCatchVariables": true,
+		"noImplicitOverride": true,
+		"verbatimModuleSyntax": true,
+		"allowJs": true,
+		"declaration": true,
+		"declarationDir": "dist",
+		"emitDeclarationOnly": true,
+		"baseUrl": ".",
+		"paths": {
+			"@scroll-sequence/core": ["packages/core/src"],
+			"@scroll-sequence/vanilla": ["packages/vanilla/src"],
+			"@scroll-sequence/react": ["packages/react/src"],
+			"@scroll-sequence/vue": ["packages/vue/src"],
+			"~/*": ["src/*"],
+			"test/*": ["test/*"]
+		},
+		"typeRoots": ["node_modules/@types", "packages/types"]
+	},
+	"include": ["packages/core/src", "packages/vanilla/src", "packages/react/src", "packages/vue/src", "playgrounds/**/*", "src", "test", "src/types"],
+	"exclude": ["dist", "node_modules"]
+}

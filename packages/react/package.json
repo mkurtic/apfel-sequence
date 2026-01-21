@@ -1,0 +1,57 @@
+{
+	"name": "@scroll-sequence/react",
+	"version": "0.1.3",
+	"author": "Mehmed Kurtic",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mkurtic/scroll-sequence.git",
+		"directory": "packages/react"
+	},
+	"bugs": {
+		"url": "https://github.com/mkurtic/scroll-sequence/issues"
+	},
+	"homepage": "https://github.com/mkurtic/scroll-sequence/tree/main/packages/react#readme",
+	"keywords": [
+		"scroll-sequence",
+		"react",
+		"component",
+		"hook",
+		"canvas",
+		"animation"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"private": false,
+	"type": "module",
+	"main": "dist/scroll-sequence-react.cjs.js",
+	"module": "dist/scroll-sequence-react.es.js",
+	"types": "dist/scroll-sequence-react.d.ts",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/scroll-sequence-react.es.js",
+			"require": "./dist/scroll-sequence-react.cjs.js"
+		}
+	},
+	"dependencies": {
+		"@scroll-sequence/core": "^0.1.3"
+	},
+	"peerDependencies": {
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-react": "^4.0.0",
+		"typescript": "^5.0.0",
+		"vite": "^5.0.0",
+		"vite-plugin-dts": "^4.5.4"
+	},
+	"scripts": {
+		"build": "vite build --config vite.config.ts",
+		"dev": "vite build --config vite.config.ts --watch"
+	}
+}

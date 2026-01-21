@@ -1,0 +1,27 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import dts from "vite-plugin-dts";
+
+export default defineConfig({
+	root: __dirname,
+	plugins: [
+		react(),
+		dts({
+			entryRoot: path.resolve(__dirname, "src"),
+			outDir: path.resolve(__dirname, "dist"),
+			insertTypesEntry: true,
+		}),
+	],
+	build: {
+		lib: {
+			entry: path.resolve(__dirname, "src/index.tsx"),
+			name: "ScrollSequenceReact",
+			formats: ["es", "cjs"],
+			fileName: (format) => (format === "es" ? "scroll-sequence-react.es.js" : "scroll-sequence-react.cjs.js"),
+		},
+		rollupOptions: {
+			external: ["react", "react-dom", "@scroll-sequence/core"],
+		},
+	},
+});

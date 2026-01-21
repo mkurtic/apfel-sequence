@@ -1,0 +1,25 @@
+---
+import ScrollSequence from "@scroll-sequence/react";
+import Layout from "../../layouts/Layout.astro";
+import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
+---
+<Layout>
+	<section id="hero">
+		<ScrollSequence 
+			client:load
+			assetsConfigs={heroAssets}
+			loadingConfig={heroLoadingConfig}
+			alt={"My hero alt text"} 
+		/>
+	</section>
+	<section id="section-2">
+		<ScrollSequence
+			client:load
+			assetsConfigs={section2Assets}
+			loadingConfig={section2LoadingConfig}
+			scrollConfig={section2ScrollConfig}
+			alt={"Section alt text"} 
+		/>
+	</section>
+	<section></section>
+</Layout>
