@@ -2,9 +2,6 @@
 
 **Smooth, light-weight, performance-optimized image sequence scrolling, do that like Apple!**
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/npm/v/scroll-sequence/core.svg)
-
 ScrollSequence allows you to create high-performance frame-by-frame scroll animations (like Apple & Sony) using HTML5 Canvas. It's framework-agnostic, responsive, and designed for speed.
 
 ## Features
@@ -21,10 +18,10 @@ ScrollSequence allows you to create high-performance frame-by-frame scroll anima
 
 | Package | Description | Size | Version |
 |---------|-------------|------|---------|
-| [`scroll-sequence/core`](./packages/core) | The core logic engine | ![size](https://img.shields.io/bundlephobia/minzip/scroll-sequence/core) | ![npm](https://img.shields.io/npm/v/scroll-sequence/core) |
-| [`scroll-sequence`](./packages/vanilla) | Wrapper for Vanilla JS | ![size](https://img.shields.io/bundlephobia/minzip/scroll-sequence) | ![npm](https://img.shields.io/npm/v/@scroll-sequence) |
-| [`scroll-sequence/react`](./packages/react) | Wrapper for React | ![size](https://img.shields.io/bundlephobia/minzip/scroll-sequence/react) | ![npm](https://img.shields.io/npm/v/scroll-sequence/react) |
-| [`scroll-sequence/vue`](./packages/vue) | Wrapper for Vue | ![size](https://img.shields.io/bundlephobia/minzip/scroll-sequence/vue) | ![npm](https://img.shields.io/npm/v/scroll-sequence/vue) |
+| [`@scroll-sequence/core`](./packages/core) | The core logic engine | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/core) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/core) |
+| [`@scroll-sequence/vanilla`](./packages/vanilla) | Wrapper for Vanilla JS | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/vanilla) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/vanilla) |
+| [`@scroll-sequence/react`](./packages/react) | Wrapper for React | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/react) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/react) |
+| [`@scroll-sequence/vue`](./packages/vue) | Wrapper for Vue | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/vue) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/vue) |
 
 ## 🛠 Installation
 
@@ -32,27 +29,27 @@ Using your preferred package manager:
 
 ```bash
 # JS
-npm install scroll-sequence
+npm install @scroll-sequence/vanilla
 
 # React
-npm install scroll-sequence/react
+npm install @scroll-sequence/react
 
 # Vue
-npm install scroll-sequence/vue
+npm install @scroll-sequence/vue
 
 
 ```
 HTML
 ```html 
-<script src="https://unpkg.com/scroll-sequence@latest/dist/scroll-sequence.min.js"></script>
-```
+<script src="https://unpkg.com/@scroll-sequence/vanilla@latest/dist/scroll-sequence.min.js"></script>
+``` 
 
 ## Quick Start
 
 ### Vanilla JS
 
 ```html
-<script src="https://unpkg.com/scroll-sequence@latest/dist/scroll-sequence.min.js"></script>
+<script src="https://unpkg.com/@scroll-sequence/vanilla@latest/dist/scroll-sequence.min.js"></script>
 <!-- ... -->
 
 <!-- ...Setup your DOM -->
@@ -145,7 +142,7 @@ const assets = [{
 </template>
 ```
 
-## Responsive Configurations
+## Responsive Breakpoints
 
 Load smaller images for mobile devices to improve performance:
 
