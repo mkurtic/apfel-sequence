@@ -43,10 +43,10 @@ export interface LoadingConfig {
 	trigger?: HTMLElement | string;
 
 	/** ScrollTrigger start position for lazy preload */
-	triggerStart?: string;
+	start?: string;
 
 	/** Whether to show markers for debugging ScrollTrigger preload */
-	triggerMarkers?: boolean;
+	markers?: boolean;
 }
 
 /**
@@ -54,16 +54,16 @@ export interface LoadingConfig {
  */
 export interface ScrollConfig {
 	/** Show ScrollTrigger markers for debugging */
-	scrollTriggerMarker?: boolean;
+	markers?: boolean;
 
 	/** Enable scrub behavior for ScrollTrigger */
-	scrollTriggerScrub?: boolean;
+	scrub?: boolean;
 
 	/** ScrollTrigger start position (default: 'top top') */
-	scrollTriggerStart?: string;
+	start?: string;
 
 	/** ScrollTrigger end position (default: '100%') */
-	scrollTriggerEnd?: string;
+	end?: string;
 }
 
 /**

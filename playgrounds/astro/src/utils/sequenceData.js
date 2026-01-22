@@ -36,11 +36,11 @@ export const section2Assets = [
 
 export const section2LoadingConfig = {
 	trigger: "#hero",
-	triggerStart: "top top",
-	triggerMarkers: false,
+	start: "top top",
+	markers: false,
 };
 
 export const section2ScrollConfig = {
-	scrollTriggerStart: "top top",
-	scrollTriggerEnd: "100%",
+	start: "top top",
+	end: "100%",
 };

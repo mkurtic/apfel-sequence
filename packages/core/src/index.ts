@@ -68,8 +68,8 @@ export class ScrollSequenceEngine {
 				}
 				this.tlPreloadFirstChunk = ScrollTrigger.create({
 					trigger: this.loadingConfig.trigger,
-					start: this.loadingConfig.triggerStart,
-					markers: this.loadingConfig.triggerMarkers,
+					start: this.loadingConfig.start,
+					markers: this.loadingConfig.markers,
 					once: true,
 					onEnter: async () => {
 						await this.frameLoaderManager?.preloadInitialFrames();
@@ -77,10 +77,10 @@ export class ScrollSequenceEngine {
 				});
 				this.frameLoaderManager.initLazyLoading(
 					this.loadingConfig.trigger,
-					this.loadingConfig.triggerStart,
+					this.loadingConfig.start,
 					"100%",
 					true,
-					this.loadingConfig.triggerMarkers,
+					this.loadingConfig.markers,
 				);
 			} else {
 				await this.frameLoaderManager.preloadInitialFrames();
@@ -103,10 +103,10 @@ export class ScrollSequenceEngine {
 			containerRef: config.container,
 			totalFrames: fallbackOnly ? 1 : this.totalFrames,
 			onFrameChange: fallbackOnly ? () => {} : this.handleFrameChange,
-			scrub: this.scrollConfig.scrollTriggerScrub,
-			start: this.scrollConfig.scrollTriggerStart,
-			end: this.scrollConfig.scrollTriggerEnd,
-			markers: this.scrollConfig.scrollTriggerMarker,
+			scrub: this.scrollConfig.scrub,
+			start: this.scrollConfig.start,
+			end: this.scrollConfig.end,
+			markers: this.scrollConfig.markers,
 			loadingMode: this.loadingConfig.loadingMode,
 			lazyLoadAroundFrame: fallbackOnly ? undefined : () => {},
 		});
@@ -173,10 +173,10 @@ export class ScrollSequenceEngine {
 
 	normalizeScrollConfig = (scrollConfig?: ScrollConfig): ScrollConfig => {
 		return {
-			scrollTriggerMarker: scrollConfig?.scrollTriggerMarker ?? false,
-			scrollTriggerScrub: scrollConfig?.scrollTriggerScrub ?? true,
-			scrollTriggerStart: scrollConfig?.scrollTriggerStart ?? "top top",
-			scrollTriggerEnd: scrollConfig?.scrollTriggerEnd ?? "100%",
+			markers: scrollConfig?.markers ?? false,
+			scrub: scrollConfig?.scrub ?? true,
+			start: scrollConfig?.start ?? "top top",
+			end: scrollConfig?.end ?? "100%",
 		};
 	};
 
@@ -189,8 +189,8 @@ export class ScrollSequenceEngine {
 			loadingMode: loadingConfig?.loadingMode ?? "lazy",
 			preloadCount: Math.min(this.minFramesToPreload, Math.ceil((this.lastFrame - this.firstFrame) * this.PRELOAD_RATIO)),
 			trigger: normalizedTrigger,
-			triggerStart: loadingConfig?.triggerStart ?? "top top",
-			triggerMarkers: loadingConfig?.triggerMarkers ?? false,
+			start: loadingConfig?.start ?? "top top",
+			markers: loadingConfig?.markers ?? false,
 		};
 	};
 
