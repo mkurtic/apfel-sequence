@@ -74,8 +74,8 @@ const sequence = new ScrollSequence({
     }
   ],
   scrollConfig: {
-    scrollTriggerScrub: true,
-    scrollTriggerStart: 'top top'
+    scrub: true,
+    start: 'top top'
   }
 });
 
@@ -108,9 +108,9 @@ export default function Hero() {
         assetsConfigs={assets}
         drawMode="cover"
         scrollConfig={{
-          scrollTriggerStart: 'top top',
-          scrollTriggerEnd: 'bottom bottom',
-          scrollTriggerScrub: true
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true
         }}
       />
     </div>
