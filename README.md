@@ -63,7 +63,7 @@ HTML
 const sequence = new ScrollSequence({
   container: document.querySelector('#sequence-container'),
   canvas: document.querySelector('#sequence-canvas'),
-  assetsConfigs: [
+  assetsConfig: [
     {
       name: 'hero',
       url: '/assets/images',
@@ -105,7 +105,7 @@ export default function Hero() {
   return (
     <div style={{ height: '300vh' }}>
       <ScrollSequence
-        assetsConfigs={assets}
+        assetsConfig={assets}
         drawMode="cover"
         scrollConfig={{
           start: 'top top',
@@ -135,7 +135,7 @@ const assets = [{
 <template>
   <div style="height: 300vh">
     <ScrollSequence 
-      :assetsConfigs="assets" 
+      :assetsConfig="assets" 
       drawMode="cover"
     />
   </div>
@@ -168,15 +168,15 @@ const assets = [
 ## Attributes
 |     Option    |     Type    |       Default       |   Description                  |
 | ------------- | ----------- | ------------------- | ------------------------------ |
-| `assetsConfigs` | `Array`       | `[]`                  | Array of asset configurations  |
+| `assetsConfig` | `Array`       | `[]`                  | Array of asset configurations  |
 | `drawMode`      | `String`      | `'cover'`             | `'cover'` or `'contain'`           |
 | `scrollConfig`  | `Object`      | `{}`                  | Scroll trigger configuration   |
 | `networkPolicy` | `adaptive \| fallback-only` |`adaptive` | Not yet implemented
 
 
-### Assets Configuration Object (`assetsConfigs`)
+### Assets Configuration Object (`assetsConfig`)
 
-Each object within the `assetsConfigs` array defines a sequence of images and supports the following properties:
+Each object within the `assetsConfig` array defines a sequence of images and supports the following properties:
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|

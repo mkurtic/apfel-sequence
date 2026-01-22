@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ScrollSequenceEngine } from "@scroll-sequence/core";
 import type { ScrollSequenceProps } from "@scroll-sequence/core";
 
-const ScrollSequence = ({ assetsConfigs, drawMode, networkPolicy, scrollConfig, loadingConfig, alt }: ScrollSequenceProps) => {
+export type ScrollSequenceReactProps = Omit<ScrollSequenceProps, "canvas" | "container">;
+
+const ScrollSequence = ({ assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt }: ScrollSequenceReactProps) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -19,7 +21,7 @@ const ScrollSequence = ({ assetsConfigs, drawMode, networkPolicy, scrollConfig, 
 		}
 
 		const engine = new ScrollSequenceEngine({
-			assetsConfigs: assetsConfigs,
+			assetsConfig: assetsConfig,
 			drawMode,
 			networkPolicy,
 			scrollConfig,
@@ -32,7 +34,7 @@ const ScrollSequence = ({ assetsConfigs, drawMode, networkPolicy, scrollConfig, 
 		return () => {
 			engine.destroy();
 		};
-	}, [assetsConfigs, drawMode, networkPolicy, scrollConfig, loadingConfig]);
+	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig]);
 
 	return (
 		<div className="scroll-sequence container" ref={containerRef}>

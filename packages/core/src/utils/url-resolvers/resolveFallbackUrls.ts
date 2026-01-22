@@ -1,7 +1,7 @@
-import type { AssetsConfig } from "../../types/scrollSequence";
+import type { AssetConfig } from "../../types/scrollSequence";
 import { getFrameHref } from "./getFrameHref";
 
-const resolveFallbackFrameUrl = (cfg: AssetsConfig): string => {
+const resolveFallbackFrameUrl = (cfg: AssetConfig): string => {
 	if (typeof cfg.frameFallback === "string") {
 		return cfg.frameFallback;
 	}

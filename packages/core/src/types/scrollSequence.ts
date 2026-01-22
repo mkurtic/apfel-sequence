@@ -1,7 +1,7 @@
 export type DrawMode = "cover" | "contain";
 export type NetworkPolicy = "adaptive" | "fallback-only";
 
-export interface AssetsConfig {
+export interface AssetConfig {
 	/** Unique name for the asset */
 	name: string;
 	/** Base URL of the frames */
@@ -27,7 +27,7 @@ export interface AssetsConfig {
 }
 
 /** Array of assets */
-export type AssetsConfigs = AssetsConfig[];
+export type AssetsConfig = AssetConfig[];
 
 /**
  * Configuration for loading frames in the scroll sequence.
@@ -72,7 +72,7 @@ export interface ScrollConfig {
 
 export interface ScrollSequenceEngine {
 	/** Array of assets to display */
-	assetsConfigs: AssetsConfigs;
+	assetsConfig: AssetsConfig;
 
 	/** Optional loading configuration */
 	loadingConfig?: LoadingConfig;
@@ -101,7 +101,7 @@ export interface ScrollSequenceEngine {
  */
 export interface ScrollSequenceProps {
 	/** Array of assets to display */
-	assetsConfigs: AssetsConfigs;
+	assetsConfig: AssetsConfig;
 
 	/** Optional loading configuration */
 	loadingConfig?: LoadingConfig;

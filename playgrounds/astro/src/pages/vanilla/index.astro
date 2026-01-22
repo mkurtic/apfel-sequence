@@ -15,21 +15,21 @@ import Layout from "../../layouts/Layout.astro";
   <section></section>
 </Layout>
 <script>
-import ScrollSequence from "scroll-sequence";
+import ScrollSequence from "@scroll-sequence/vanilla";
 import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
 
 const scrollSequenceHero = ScrollSequence({
   canvas: document.querySelector("#canvas"),
   container: document.querySelector("#canvas-container"),
-  assetsConfigs: heroAssets,
+  assetsConfig: heroAssets,
   loadingConfig: heroLoadingConfig,
 });
 
-  
+
 const scrollSequenceSection2 = ScrollSequence({
   canvas: document.querySelector("#canvas-2"),
   container: document.querySelector("#canvas-container-2"),
-  assetsConfigs: section2Assets,
+  assetsConfig: section2Assets,
   loadingConfig: section2LoadingConfig,
   scrollConfig: section2ScrollConfig,
 });
