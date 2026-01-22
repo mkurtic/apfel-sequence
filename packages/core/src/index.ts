@@ -122,6 +122,9 @@ export class ScrollSequenceEngine {
 	};
 
 	initBreakpointsManager = () => {
+		if (!this.config.assetsConfig || !Array.isArray(this.config.assetsConfig)) {
+			throw new Error("ScrollSequence: assetsConfig is required and must be an array. Please check your options.");
+		}
 		this.breakpoints = this.normalizeBreakpoints(this.config.assetsConfig);
 		this.activeBreakpointManager = new ActiveBreakpoint(this.breakpoints);
 		this.activeBreakpointManager.init();
