@@ -6,7 +6,7 @@ import { ActiveBreakpoint } from "./active-breakpoint/active-breakpoint";
 import resolveFallbackFrameUrl from "./utils/url-resolvers/resolveFallbackUrls";
 import { FrameLoader } from "./frame-loader/frame-loader";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasRender } from "./canvas-render/canvas-render";
 gsap.registerPlugin(ScrollTrigger);
 
