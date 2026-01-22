@@ -1,6 +1,6 @@
 import { PrefersReducedMotion } from "./reduce-motion/reduce-motion";
-import type { AssetsConfigs, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps } from "./types/scrollSequence";
-export type { AssetsConfigs, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps };
+import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps } from "./types/scrollSequence";
+export type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps };
 import { ScrollEngine } from "./scroll-engine/scroll-engine";
 import { ActiveBreakpoint } from "./active-breakpoint/active-breakpoint";
 import resolveFallbackFrameUrl from "./utils/url-resolvers/resolveFallbackUrls";
@@ -122,7 +122,7 @@ export class ScrollSequenceEngine {
 	};
 
 	initBreakpointsManager = () => {
-		this.breakpoints = this.normalizeBreakpoints(this.config.assetsConfigs);
+		this.breakpoints = this.normalizeBreakpoints(this.config.assetsConfig);
 		this.activeBreakpointManager = new ActiveBreakpoint(this.breakpoints);
 		this.activeBreakpointManager.init();
 		this.activeBreakpoint = this.activeBreakpointManager.getActive();
@@ -156,7 +156,7 @@ export class ScrollSequenceEngine {
 		this.minFramesToPreload = this.totalFrames < this.MIN_FRAMES_TO_PRELOAD ? this.totalFrames : this.MIN_FRAMES_TO_PRELOAD;
 	};
 
-	normalizeBreakpoints = (assetsConfig: AssetsConfigs) => {
+	normalizeBreakpoints = (assetsConfig: AssetsConfig) => {
 		return assetsConfig.map((cfg, index) => ({
 			...cfg,
 			name: cfg.name || `asset-${index}`,

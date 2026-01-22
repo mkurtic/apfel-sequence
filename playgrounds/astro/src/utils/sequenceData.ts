@@ -1,4 +1,6 @@
-export const heroAssets = [
+import type { AssetsConfig, LoadingConfig, ScrollConfig } from "@scroll-sequence/core";
+
+export const heroAssets: AssetsConfig = [
 	{
 		name: "desktop",
 		url: "/images/sequences/1/desktop/A_",
@@ -19,11 +21,11 @@ export const heroAssets = [
 	},
 ];
 
-export const heroLoadingConfig = {
+export const heroLoadingConfig: LoadingConfig = {
 	loadingMode: "eager",
 };
 
-export const section2Assets = [
+export const section2Assets: AssetsConfig = [
 	{
 		name: "largeImages",
 		url: "/images/sequences/2/B_",
@@ -34,13 +36,13 @@ export const section2Assets = [
 	},
 ];
 
-export const section2LoadingConfig = {
+export const section2LoadingConfig: LoadingConfig = {
 	trigger: "#hero",
 	start: "top top",
 	markers: false,
 };
 
-export const section2ScrollConfig = {
+export const section2ScrollConfig: ScrollConfig = {
 	start: "top top",
 	end: "100%",
 };
