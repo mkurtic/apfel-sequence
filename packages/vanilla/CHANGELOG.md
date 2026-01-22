@@ -1,5 +1,16 @@
 # @scroll-sequence/vanilla
 
+## 1.1.0
+
+### Minor Changes
+
+- fix: fix component props and strictly type playground data definitions
+
+### Patch Changes
+
+- Updated dependencies
+  - @scroll-sequence/core@1.1.0
+
 ## 1.0.2
 
 ### Patch Changes

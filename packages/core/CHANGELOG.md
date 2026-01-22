@@ -1,5 +1,11 @@
 # @scroll-sequence/core
 
+## 1.1.0
+
+### Minor Changes
+
+- fix: fix component props and strictly type playground data definitions
+
 ## 1.0.1
 
 ### Patch Changes
