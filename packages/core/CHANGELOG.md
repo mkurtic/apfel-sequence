@@ -1,5 +1,11 @@
 # @scroll-sequence/core
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix module resolution by using .mjs for ESM build and correcting type definitions.
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,11 @@
 # @scroll-sequence/vanilla
 
+## 1.0.1
+
+### Patch Changes
+
+- Bump versions to ensure fresh release after core update.
+
 ## 1.0.0
 
 ### Major Changes
