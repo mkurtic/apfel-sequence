@@ -2,7 +2,14 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [],
+  "fixed": [
+    [
+      "@scroll-sequence/core",
+      "@scroll-sequence/react",
+      "@scroll-sequence/vanilla",
+      "@scroll-sequence/vue"
+    ]
+  ],
   "linked": [],
   "access": "restricted",
   "baseBranch": "main",
