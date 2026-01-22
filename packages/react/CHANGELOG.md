@@ -1,5 +1,11 @@
 # @scroll-sequence/react
 
+## 1.0.2
+
+### Patch Changes
+
+- Fix CommonJS output extensions to be .cjs for compatibility with "type": "module".
+
 ## 1.0.1
 
 ### Patch Changes

@@ -18,7 +18,7 @@ export default defineConfig({
 			entry: path.resolve(__dirname, "src/index.ts"),
 			name: "ScrollSequenceVue",
 			formats: ["es", "cjs"],
-			fileName: (format) => (format === "es" ? "scroll-sequence-vue.es.js" : "scroll-sequence-vue.cjs.js"),
+			fileName: (format) => (format === "es" ? "scroll-sequence-vue.es.js" : "scroll-sequence-vue.cjs"),
 		},
 		rollupOptions: {
 			external: ["vue", "@scroll-sequence/core"],

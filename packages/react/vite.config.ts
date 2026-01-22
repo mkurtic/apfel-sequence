@@ -18,7 +18,7 @@ export default defineConfig({
 			entry: path.resolve(__dirname, "src/index.tsx"),
 			name: "ScrollSequenceReact",
 			formats: ["es", "cjs"],
-			fileName: (format) => (format === "es" ? "scroll-sequence-react.es.js" : "scroll-sequence-react.cjs.js"),
+			fileName: (format) => (format === "es" ? "scroll-sequence-react.es.js" : "scroll-sequence-react.cjs"),
 		},
 		rollupOptions: {
 			external: ["react", "react-dom", "@scroll-sequence/core"],

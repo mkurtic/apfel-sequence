@@ -1,6 +1,6 @@
 {
 	"name": "@scroll-sequence/react",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
@@ -25,7 +25,7 @@
 	},
 	"private": false,
 	"type": "module",
-	"main": "dist/scroll-sequence-react.cjs.js",
+	"main": "dist/scroll-sequence-react.cjs",
 	"module": "dist/scroll-sequence-react.es.js",
 	"types": "dist/scroll-sequence-react.d.ts",
 	"files": [
@@ -34,7 +34,7 @@
 	"exports": {
 		".": {
 			"import": "./dist/scroll-sequence-react.es.js",
-			"require": "./dist/scroll-sequence-react.cjs.js"
+			"require": "./dist/scroll-sequence-react.cjs"
 		}
 	},
 	"dependencies": {

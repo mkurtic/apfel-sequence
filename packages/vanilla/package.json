@@ -1,6 +1,6 @@
 {
 	"name": "@scroll-sequence/vanilla",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
@@ -22,7 +22,7 @@
 		"access": "public"
 	},
 	"type": "module",
-	"main": "dist/scroll-sequence.cjs.js",
+	"main": "dist/scroll-sequence.cjs",
 	"module": "dist/scroll-sequence.es.js",
 	"types": "dist/scroll-sequence.d.ts",
 	"files": [
@@ -31,7 +31,7 @@
 	"exports": {
 		".": {
 			"import": "./dist/scroll-sequence.es.js",
-			"require": "./dist/scroll-sequence.cjs.js"
+			"require": "./dist/scroll-sequence.cjs"
 		}
 	},
 	"dependencies": {
