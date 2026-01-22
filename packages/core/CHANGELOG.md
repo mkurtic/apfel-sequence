@@ -1,5 +1,11 @@
 # @scroll-sequence/core
 
+## 1.1.2
+
+### Patch Changes
+
+- Added validation check for `assetsConfig` to ensure it is provided and is an array. Throws a descriptive error if missing.
+
 ## 1.1.1
 
 ### Patch Changes
