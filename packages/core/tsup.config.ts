@@ -12,7 +12,7 @@ export default defineConfig([
 		outDir: OUT_DIR,
 		clean: true,
 		target: "es2020",
-		outExtension: () => ({ js: ".esm.js", dts: ".d.ts" }),
+		outExtension: () => ({ js: ".mjs", dts: ".d.ts" }),
 	},
 	// CJS build
 	{
