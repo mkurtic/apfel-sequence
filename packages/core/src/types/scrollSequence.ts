@@ -1,6 +1,17 @@
 export type DrawMode = "cover" | "contain";
 export type NetworkPolicy = "adaptive" | "fallback-only";
 
+export interface Frame {
+	frameNumber: number;
+	startTime: number;
+	endTime: number;
+	duration: number;
+	status: "success" | "error" | "pending";
+	url: string;
+	image: HTMLImageElement | null;
+	attempts: number;
+}
+
 export interface AssetConfig {
 	/** Unique name for the asset */
 	name: string;
@@ -47,6 +58,15 @@ export interface LoadingConfig {
 
 	/** Whether to show markers for debugging ScrollTrigger preload */
 	markers?: boolean;
+
+	/** Callback when a frame finishes loading (success or failure) */
+	onFrameLoaded?: (stat: Frame) => void;
+
+	/** Number of retries for failed frame loads (default: 3) */
+	maxRetries?: number;
+
+	/** Delay in ms between retries (default: 200) */
+	retryDelay?: number;
 }
 
 /**
@@ -135,7 +155,7 @@ export interface BreakpointConfig {
 	/** Maximum window width for this breakpoint (inclusive) */
 	breakpointMax?: number;
 	/** Preloaded frames */
-	frames: (HTMLImageElement | null)[];
+	frames: (Frame | null)[];
 	/** Optional fallback frame URL */
 	fallbackFrameUrl?: string | null;
 	/** Optional fallback frame */
@@ -160,6 +180,9 @@ export interface FrameLoaderProps {
 	lastFrame: number;
 	preloadCount: number;
 	networkPolicy?: NetworkPolicy;
+	onFrameLoaded?: (stat: Frame) => void;
+	maxRetries: number;
+	retryDelay: number;
 }
 
 export interface ScrollEngineProps {

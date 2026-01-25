@@ -1,5 +1,5 @@
 import { PrefersReducedMotion } from "./reduce-motion/reduce-motion";
-import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps } from "./types/scrollSequence";
+import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps, Frame } from "./types/scrollSequence";
 export type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps };
 import { ScrollEngine } from "./scroll-engine/scroll-engine";
 import { ActiveBreakpoint } from "./active-breakpoint/active-breakpoint";
@@ -57,7 +57,7 @@ export class ScrollSequenceEngine {
 		await this.frameLoaderManager.loadFirstFrame();
 
 		if (this.activeBreakpoint) {
-			const first = this.activeBreakpoint.frames[0] || this.activeBreakpoint.fallbackFrame || null;
+			const first = this.activeBreakpoint.frames[0]?.image || this.activeBreakpoint.fallbackFrame || null;
 			this.canvasRender.drawFrame(first, this.activeBreakpoint.fallbackFrame || null);
 		}
 
@@ -86,7 +86,7 @@ export class ScrollSequenceEngine {
 				await this.frameLoaderManager.preloadInitialFrames();
 			}
 		} else {
-			await this.frameLoaderManager.progressiveLoadImages();
+			await this.frameLoaderManager.progressiveLoad();
 		}
 	};
 
@@ -163,7 +163,7 @@ export class ScrollSequenceEngine {
 		return assetsConfig.map((cfg, index) => ({
 			...cfg,
 			name: cfg.name || `asset-${index}`,
-			frames: new Array((cfg.frameLastId ?? 1) - (cfg.frameFirstId ?? 1) + 1).fill(null) as (HTMLImageElement | null)[],
+			frames: new Array((cfg.frameLastId ?? 1) - (cfg.frameFirstId ?? 1) + 1).fill(null) as (Frame | null)[],
 			fallbackFrameUrl: resolveFallbackFrameUrl(cfg),
 			fallbackFrame: null,
 			frameDigits: cfg.frameDigits ?? 4,
@@ -194,6 +194,9 @@ export class ScrollSequenceEngine {
 			trigger: normalizedTrigger,
 			start: loadingConfig?.start ?? "top top",
 			markers: loadingConfig?.markers ?? false,
+			onFrameLoaded: loadingConfig?.onFrameLoaded,
+			maxRetries: loadingConfig?.maxRetries ?? 3,
+			retryDelay: loadingConfig?.retryDelay ?? 200,
 		};
 	};
 
@@ -203,8 +206,11 @@ export class ScrollSequenceEngine {
 			activeBreakpoint: this.activeBreakpoint,
 			firstFrame: this.firstFrame,
 			lastFrame: this.lastFrame,
-			preloadCount: this.minFramesToPreload,
+			preloadCount: this.loadingConfig?.preloadCount ?? this.minFramesToPreload,
 			networkPolicy: this.config.networkPolicy,
+			onFrameLoaded: this.loadingConfig?.onFrameLoaded,
+			maxRetries: this.loadingConfig?.maxRetries ?? 3,
+			retryDelay: this.loadingConfig?.retryDelay ?? 200,
 		});
 	};
 
@@ -216,8 +222,8 @@ export class ScrollSequenceEngine {
 		const frame = frames[frameId];
 		const fallback = this.activeBreakpoint?.fallbackFrame;
 
-		if (!frame && !fallback) return; // nothing to draw yet
-		this.canvasRender.drawFrame(this.activeBreakpoint.frames[frameId], this.activeBreakpoint.fallbackFrame);
+		if (!frame?.image && !fallback) return; // nothing to draw yet
+		this.canvasRender.drawFrame(frame?.image || null, this.activeBreakpoint.fallbackFrame);
 	};
 
 	resize = () => {

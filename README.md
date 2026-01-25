@@ -192,6 +192,23 @@ Each object within the `assetsConfig` array defines a sequence of images and sup
 | `frameFallback` | `string \| number` | - | Frame number or image URL to show before load. |
 | `renderCanvas` | `boolean` | `true` | Whether to render the sequence on the canvas. |
 
+## Loading Configuration (`loadingConfig`)
+
+You can control how frames are loaded (e.g., eager vs lazy, retry logic) using the `loadingConfig` prop.
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `loadingMode` | `'eager' \| 'lazy'` | `'lazy'` | `'eager'` loads all immediately; `'lazy'` waits for trigger. |
+| `maxRetries` | `number` | `3` | Attempts to retry failed frames. |
+| `retryDelay` | `number` | `200` | Delay (ms) between retries. |
+| `preloadCount` | `number` | (calculated) | Number of frames to force-load initially to be always ahead of the current scroll position of the users. |
+| `onFrameLoaded` | `function` | - | Callback `(stat) => void` for tracking load status. |
+
+### Loading Strategy
+1.  **Sequential (Passive)**: Initial & progressive loading happens one-by-one to save bandwidth.
+2.  **Parallel (Active)**: Scrubbing/lazy-loading requests neighbors in parallel for speed.
+3.  **Resilience**: Auto-retries failed frames (3 attempts by default).
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
