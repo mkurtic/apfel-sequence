@@ -143,6 +143,9 @@ export interface ScrollSequenceProps {
 
 	/* Canvas's container */
 	container: HTMLElement;
+	
+	/** Whether to clear the cache when the breakpoint changes (default: false) */
+	clearCacheOnBreakpointChange?: boolean;
 }
 
 export interface BreakpointConfig {
