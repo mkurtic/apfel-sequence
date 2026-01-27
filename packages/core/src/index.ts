@@ -29,11 +29,13 @@ export class ScrollSequenceEngine {
 	private prefersReducedMotion: PrefersReducedMotion | null = null;
 	private dpr: number = 1;
 	private resizeObserver: ResizeObserver | null = null;
+	private clearCacheOnBreakpointChange: boolean = false;
 	constructor(config: ScrollSequenceProps) {
 		this.config = config;
 		this.breakpoints = [];
 
 		this.prefersReducedMotion = new PrefersReducedMotion();
+		this.clearCacheOnBreakpointChange = config.clearCacheOnBreakpointChange ?? false;
 
 		this.dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 		const canvasRenderProps = {
@@ -99,6 +101,8 @@ export class ScrollSequenceEngine {
 		this.scrollConfig = this.normalizeScrollConfig(config.scrollConfig);
 		this.loadingConfig = this.normalizeLoadingConfig(config.loadingConfig);
 
+		
+
 		this.scrollEngine = new ScrollEngine({
 			containerRef: config.container,
 			totalFrames: fallbackOnly ? 1 : this.totalFrames,
@@ -135,6 +139,25 @@ export class ScrollSequenceEngine {
 			this.normalizeFramesRange(this.activeBreakpoint);
 			this.initFramesLoadingManager();
 			await this.initFramesLoadings();
+			if(this.clearCacheOnBreakpointChange){
+				this.breakpoints.forEach((breakpoint) => {
+					if (breakpoint.name !== this.activeBreakpoint?.name) {
+						breakpoint.frames.forEach((frame) => {
+							if (!frame || !frame.image) return;
+
+							if (frame.image.src.startsWith("blob:")) {
+								URL.revokeObjectURL(frame.image.src);
+							}
+
+							frame.image.src = "";
+							frame.image.onload = null;
+							frame.image.onerror = null;
+							frame.image = null;
+						});
+						breakpoint.frames = [];
+					}
+				});
+			}
 		});
 	};
 

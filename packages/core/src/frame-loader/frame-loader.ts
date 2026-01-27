@@ -96,6 +96,7 @@ class FrameLoader {
 
 				this.activeBreakpoint.frames[index] = stat;
 				this.loadingFrames.delete(index);
+				return;
 			} catch (error) {
 				lastError = error;
 				if (attempt < this.maxRetries) {
@@ -140,9 +141,23 @@ class FrameLoader {
 	private loadInternal(src: string): Promise<HTMLImageElement> {
 		return new Promise((resolve, reject) => {
 			const img = new Image();
-			img.onload = () => resolve(img);
-			img.onerror = (e) => reject(e);
 			img.src = src;
+
+			if (typeof (img as HTMLImageElement).decode === "function") {
+				img.decode()
+					.then(() => resolve(img))
+					.catch(() => {
+						if (img.complete) {
+							resolve(img);
+							return;
+						}
+						img.onload = () => resolve(img);
+						img.onerror = (err: unknown) => reject(err);
+					});
+			} else {
+				img.onload = () => resolve(img);
+				img.onerror = (e: unknown) => reject(e);
+			}
 		});
 	}
 
