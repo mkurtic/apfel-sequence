@@ -137,8 +137,8 @@ describe("ActiveBreakpoint", () => {
         vi.stubGlobal("innerWidth", 802);
 		window.dispatchEvent(new Event("resize"));
 
-        // Should not have triggered update yet (assuming some delay)
-        // Note: Initial subscribe calls listener once.
+        // Should not have triggered update yet
+        // Initial subscribe calls listener once
         expect(listener).toHaveBeenCalledTimes(1); 
 
         // Fast forward time
@@ -159,7 +159,7 @@ describe("ActiveBreakpoint", () => {
 		const listener = vi.fn();
 		manager.subscribe(listener); // +1 call
 
-		// Resize but stay mobile
+		// Resize to mobile
 		vi.stubGlobal("innerWidth", 600);
 		window.dispatchEvent(new Event("resize"));
 

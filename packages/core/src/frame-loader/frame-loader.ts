@@ -16,7 +16,8 @@ class FrameLoader {
 	private onFrameLoaded?: (stat: Frame) => void;
 	private maxRetries: number;
 	private retryDelay: number;
-
+	private queue: { frameNumber: number; resolve: () => void; reject: (err: unknown) => void }[] = [];
+	private isProcessing: boolean = false;
 	constructor(config: FrameLoaderProps) {
 		this.activeBreakpoint = config.activeBreakpoint;
 		this.firstFrame = config.firstFrame;
@@ -27,8 +28,7 @@ class FrameLoader {
 		this.maxRetries = config.maxRetries;
 		this.retryDelay = config.retryDelay;
 	}
-	private queue: { frameNumber: number; resolve: () => void; reject: (err: unknown) => void }[] = [];
-	private isProcessing: boolean = false;
+
 
 	async loadFrame(
 		frameNumber: number,
