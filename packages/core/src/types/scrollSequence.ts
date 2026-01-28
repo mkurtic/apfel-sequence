@@ -1,3 +1,4 @@
+import { Emitter } from "../utils/emitter/emitter";
 export type DrawMode = "cover" | "contain";
 export type NetworkPolicy = "adaptive" | "fallback-only";
 
@@ -10,6 +11,7 @@ export interface Frame {
 	url: string;
 	image: HTMLImageElement | null;
 	attempts: number;
+	index: number;
 }
 
 export interface AssetConfig {
@@ -178,6 +180,7 @@ export interface BreakpointConfig {
 export type BreakpointsConfigs = BreakpointConfig[];
 
 export interface FrameLoaderProps {
+	emitter: Emitter;
 	activeBreakpoint: BreakpointConfig;
 	firstFrame: number;
 	lastFrame: number;

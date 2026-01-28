@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FrameLoader } from "./frame-loader";
 import type { BreakpointConfig } from "../types/scrollSequence";
+import { Emitter } from "../utils/emitter/emitter";
+
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
 vi.mock("gsap/dist/ScrollTrigger", () => ({
 	ScrollTrigger: {
@@ -51,6 +54,7 @@ describe("FrameLoader", () => {
 	describe("Sequential Loading Mode", () => {
 		beforeEach(() => {
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -98,14 +102,15 @@ describe("FrameLoader", () => {
 			});
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 200,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// multiple frames => queued
 			const promises = [
@@ -125,14 +130,15 @@ describe("FrameLoader", () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 200,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// same frame twice
 			const promise1 = frameLoader.loadFrame(1, "sequential");
@@ -151,6 +157,7 @@ describe("FrameLoader", () => {
 	describe("Parallel Loading Mode", () => {
 		beforeEach(() => {
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -193,6 +200,7 @@ describe("FrameLoader", () => {
 			// Reset
 			mockBreakpoint.frames = new Array(10).fill(null);
 			const sequentialLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -221,14 +229,15 @@ describe("FrameLoader", () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 200,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// same frame parallel
 			const promises = [
@@ -250,14 +259,15 @@ describe("FrameLoader", () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 200,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// Mix of sequential and parallel
 			const promises = [
@@ -289,14 +299,15 @@ describe("FrameLoader", () => {
 			vi.useRealTimers();
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 200,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			await frameLoader.loadFrame(1, "parallel");
 
@@ -339,14 +350,15 @@ describe("FrameLoader", () => {
 			} as any;
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 100,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameFailed', onFrameLoaded);
 
 			const loadPromise = frameLoader.loadFrame(1, "parallel");
 
@@ -395,14 +407,15 @@ describe("FrameLoader", () => {
 			} as any;
 
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
 				retryDelay: 10,
-				onFrameLoaded,
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			const loadPromise = frameLoader.loadFrame(1, "parallel");
 
@@ -425,14 +438,15 @@ describe("FrameLoader", () => {
 		it("should init ScrollTrigger and load neighbors on update", async () => {
 			const onFrameLoaded = vi.fn();
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
 				preloadCount: 0, 
 				maxRetries: 1,
 				retryDelay: 0,
-				onFrameLoaded
 			});
+			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// Spy on loadFrame
 			const loadFrameSpy = vi.spyOn(frameLoader, 'loadFrame');
@@ -460,6 +474,7 @@ describe("FrameLoader", () => {
 	describe("Preloading", () => {
 		it("should preload the specified number of frames", async () => {
 			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ActiveBreakpoint } from "./active-breakpoint";
+import { Emitter } from "../utils/emitter/emitter";
 import type { BreakpointConfig } from "../types/scrollSequence";
 
 describe("ActiveBreakpoint", () => {
@@ -39,7 +40,7 @@ describe("ActiveBreakpoint", () => {
 	});
 
 	it("should throw error if breakpoints array is empty", () => {
-		expect(() => new ActiveBreakpoint([])).toThrow("ActiveBreakpoint requires at least one breakpoint");
+		expect(() => new ActiveBreakpoint([], new Emitter())).toThrow("ActiveBreakpoint requires at least one breakpoint");
 	});
 
     it("should throw error if breakpoints overlap", () => {
@@ -47,22 +48,22 @@ describe("ActiveBreakpoint", () => {
             { name: "small", breakpointMin: 0, breakpointMax: 600, frames: [], frameDigits: 4, url: "" },
             { name: "large", breakpointMin: 500, breakpointMax: 1000, frames: [], frameDigits: 4, url: "" }
         ];
-        expect(() => new ActiveBreakpoint(overlappingBreakpoints)).toThrow("Breakpoints overlap");
+        expect(() => new ActiveBreakpoint(overlappingBreakpoints, new Emitter())).toThrow("Breakpoints overlap");
     });
 
 	it("should initialize with the correct breakpoint based on window width", () => {
 		vi.stubGlobal("innerWidth", 500);
-		const manager = new ActiveBreakpoint(breakpoints);
+		const manager = new ActiveBreakpoint(breakpoints, new Emitter());
 		manager.init();
 		expect(manager.getActive().name).toBe("mobile");
 
 		vi.stubGlobal("innerWidth", 800);
-		const manager2 = new ActiveBreakpoint(breakpoints);
+		const manager2 = new ActiveBreakpoint(breakpoints, new Emitter());
 		manager2.init();
 		expect(manager2.getActive().name).toBe("tablet");
 
         vi.stubGlobal("innerWidth", 1200);
-		const manager3 = new ActiveBreakpoint(breakpoints);
+		const manager3 = new ActiveBreakpoint(breakpoints, new Emitter());
 		manager3.init();
 		expect(manager3.getActive().name).toBe("desktop");
 	});
@@ -75,7 +76,7 @@ describe("ActiveBreakpoint", () => {
         ];
         
         vi.stubGlobal("innerWidth", 550); // In the gap
-        const manager = new ActiveBreakpoint(gapBreakpoints);
+        const manager = new ActiveBreakpoint(gapBreakpoints, new Emitter());
         // Should throw error
         expect(() => manager.init()).toThrow("No breakpoint found for width 550");
     });
@@ -83,7 +84,7 @@ describe("ActiveBreakpoint", () => {
 	it("should update active breakpoint on window resize", () => {
         vi.useFakeTimers();
 		vi.stubGlobal("innerWidth", 500);
-		const manager = new ActiveBreakpoint(breakpoints);
+		const manager = new ActiveBreakpoint(breakpoints, new Emitter());
 		manager.init();
 		expect(manager.getActive().name).toBe("mobile");
 
@@ -100,14 +101,12 @@ describe("ActiveBreakpoint", () => {
 	it("should notify subscribers when breakpoint changes", () => {
         vi.useFakeTimers();
 		vi.stubGlobal("innerWidth", 500);
-		const manager = new ActiveBreakpoint(breakpoints);
+        const emitter = new Emitter();
+        const emitSpy = vi.spyOn(emitter, 'emit');
+		const manager = new ActiveBreakpoint(breakpoints, emitter);
 		manager.init();
 
-		const listener = vi.fn();
-		manager.subscribe(listener);
-
-        expect(listener).toHaveBeenCalledTimes(1);
-        expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ name: "mobile" }));
+        expect(emitSpy).toHaveBeenCalledWith("breakpointChanged", expect.objectContaining({ name: "mobile" }));
 
 		// Resize to tablet
 		vi.stubGlobal("innerWidth", 800);
@@ -115,19 +114,21 @@ describe("ActiveBreakpoint", () => {
 
         vi.advanceTimersByTime(150);
 
-		expect(listener).toHaveBeenCalledTimes(2);
-		expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ name: "tablet" }));
+		expect(emitSpy).toHaveBeenCalledWith("breakpointChanged", expect.objectContaining({ name: "tablet" }));
         vi.useRealTimers();
 	});
 
     it("should debounce resize events", () => {
         vi.useFakeTimers();
         vi.stubGlobal("innerWidth", 500);
-		const manager = new ActiveBreakpoint(breakpoints);
+        const emitter = new Emitter();
+        const emitSpy = vi.spyOn(emitter, 'emit');
+		const manager = new ActiveBreakpoint(breakpoints, emitter);
 		manager.init();
         
-        const listener = vi.fn();
-		manager.subscribe(listener);
+        // Initial emit
+        expect(emitSpy).toHaveBeenCalledTimes(1);
+        emitSpy.mockClear();
 
         // Resize multiple times quickly
         vi.stubGlobal("innerWidth", 800);
@@ -138,14 +139,14 @@ describe("ActiveBreakpoint", () => {
 		window.dispatchEvent(new Event("resize"));
 
         // Should not have triggered update yet
-        // Initial subscribe calls listener once
-        expect(listener).toHaveBeenCalledTimes(1); 
+        expect(emitSpy).not.toHaveBeenCalled(); 
 
         // Fast forward time
         vi.advanceTimersByTime(200); // Assuming 200ms debounce or similar
 
-        // Now it should have updated
-        expect(listener).toHaveBeenCalledTimes(2);
+        // Now it should have updated once
+        expect(emitSpy).toHaveBeenCalledTimes(1);
+        expect(emitSpy).toHaveBeenCalledWith("breakpointChanged", expect.anything());
         
         vi.useRealTimers();
     });
@@ -153,11 +154,14 @@ describe("ActiveBreakpoint", () => {
 	it("should NOT notify subscribers if resize doesn't change active breakpoint", () => {
         vi.useFakeTimers();
 		vi.stubGlobal("innerWidth", 500);
-		const manager = new ActiveBreakpoint(breakpoints);
+        const emitter = new Emitter();
+        const emitSpy = vi.spyOn(emitter, 'emit');
+		const manager = new ActiveBreakpoint(breakpoints, emitter);
 		manager.init();
 
-		const listener = vi.fn();
-		manager.subscribe(listener); // +1 call
+        // Initial emit
+        expect(emitSpy).toHaveBeenCalledTimes(1);
+        emitSpy.mockClear();
 
 		// Resize to mobile
 		vi.stubGlobal("innerWidth", 600);
@@ -165,33 +169,12 @@ describe("ActiveBreakpoint", () => {
 
         vi.advanceTimersByTime(150);
 
-		expect(listener).toHaveBeenCalledTimes(1);
+		expect(emitSpy).not.toHaveBeenCalled();
         vi.useRealTimers();
 	});
 
-    it("should unsubscribe correctly", () => {
-        vi.useFakeTimers();
-        vi.stubGlobal("innerWidth", 500);
-		const manager = new ActiveBreakpoint(breakpoints);
-		manager.init();
-
-		const listener = vi.fn();
-		const unsubscribe = manager.subscribe(listener);
-
-        unsubscribe();
-
-        // Resize
-        vi.stubGlobal("innerWidth", 800);
-		window.dispatchEvent(new Event("resize"));
-
-        vi.advanceTimersByTime(150);
-
-        expect(listener).toHaveBeenCalledTimes(1); // Only the initial call
-        vi.useRealTimers();
-    });
-
 	it("should clean up listeners on destroy", () => {
-		const manager = new ActiveBreakpoint(breakpoints);
+		const manager = new ActiveBreakpoint(breakpoints, new Emitter());
 		manager.init();
         
         const removeSpy = vi.spyOn(window, 'removeEventListener');

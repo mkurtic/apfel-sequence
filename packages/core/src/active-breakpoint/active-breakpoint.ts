@@ -1,14 +1,15 @@
 import type { BreakpointConfig } from "../types/scrollSequence";
+import type { Emitter } from "../utils/emitter/emitter";
 
-type BreakpointListener<T> = (active: T) => void;
 
 export class ActiveBreakpoint<T extends BreakpointConfig> {
 	private breakpoints: T[];
 	private active: T;
-	private listeners = new Set<BreakpointListener<T>>();
 	private resizeHandler: () => void;
+	private emitter: Emitter;
 
-	constructor(breakpoints: T[]) {
+	constructor(breakpoints: T[], emitter: Emitter) {
+		this.emitter = emitter;
 		if (breakpoints.length === 0) {
 			throw new Error("ActiveBreakpoint requires at least one breakpoint");
 		}
@@ -41,29 +42,20 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 
 	init() {
 		this.update();
-		if (typeof window !== "undefined") {
-			window.addEventListener("resize", this.resizeHandler);
-		}
+		if(typeof window == "undefined") return;
+		window.addEventListener("resize", this.resizeHandler);
+		this.emitter.emit("breakpointChanged", this.active);
 	}
 
 	destroy() {
-		if (typeof window !== "undefined") {
-			window.removeEventListener("resize", this.resizeHandler);
-		}
-		this.listeners.clear();
+		if (typeof window == "undefined") return;
+		window.removeEventListener("resize", this.resizeHandler);
 	}
 
 	getActive(): T {
 		return this.active;
 	}
 
-	subscribe(listener: BreakpointListener<T>) {
-		this.listeners.add(listener);
-		listener(this.active);
-		return () => {
-			this.listeners.delete(listener);
-		};
-	}
 
 	private update() {
 		if (typeof window === "undefined") return;
@@ -81,7 +73,7 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 
 		if (next !== this.active) {
 			this.active = next;
-			this.listeners.forEach((l) => l(this.active));
+			this.emitter.emit("breakpointChanged", this.active);
 		}
 	}
 }

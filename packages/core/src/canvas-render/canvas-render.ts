@@ -1,6 +1,7 @@
 import type { DrawMode } from "../types/scrollSequence";
 import { scaleToCover } from "../utils/canvas/scaleToCover";
 import { scaleToContain } from "../utils/canvas/scaleToContain";
+import type { Emitter } from "../utils/emitter/emitter";
 
 class CanvasRender {
 	private dpr: number;
@@ -9,11 +10,17 @@ class CanvasRender {
 	private container: HTMLElement;
 	private lastDrawnFrame: HTMLImageElement | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
-	constructor(config: { canvas: HTMLCanvasElement; container: HTMLElement; dpr: number; drawMode: DrawMode | undefined }) {
+	private emitter: Emitter;
+	constructor(config: {emitter: Emitter, canvas: HTMLCanvasElement; container: HTMLElement; dpr: number; drawMode: DrawMode | undefined }) {
+		this.emitter = config.emitter;
 		this.dpr = config.dpr;
 		this.drawMode = config.drawMode;
 		this.canvas = config.canvas;
 		this.container = config.container;
+
+		this.emitter.subscribe("drawFrame", (frame: HTMLImageElement | null, fallback: HTMLImageElement | null | undefined) => {
+			this.drawFrame(frame, fallback);
+		});
 	}
 
 	private renderImage(image: HTMLImageElement, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {

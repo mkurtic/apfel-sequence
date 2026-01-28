@@ -8,6 +8,7 @@ import { FrameLoader } from "./frame-loader/frame-loader";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasRender } from "./canvas-render/canvas-render";
+import { Emitter } from "./utils/emitter/emitter";
 gsap.registerPlugin(ScrollTrigger);
 
 export class ScrollSequenceEngine {
@@ -30,15 +31,23 @@ export class ScrollSequenceEngine {
 	private dpr: number = 1;
 	private resizeObserver: ResizeObserver | null = null;
 	private clearCacheOnBreakpointChange: boolean = false;
+	private emitter: Emitter;
 	constructor(config: ScrollSequenceProps) {
+		this.emitter = new Emitter();
 		this.config = config;
 		this.breakpoints = [];
 
-		this.prefersReducedMotion = new PrefersReducedMotion();
+		this.prefersReducedMotion = new PrefersReducedMotion(this.emitter);
+		this.prefersReducedMotion.init();
+		
+		this.emitter.subscribe("motionPreferenceChanged", (isReduced: boolean) => {
+			this.initFramesLoadings();
+		});
 		this.clearCacheOnBreakpointChange = config.clearCacheOnBreakpointChange ?? false;
 
 		this.dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 		const canvasRenderProps = {
+			emitter: this.emitter,
 			canvas: this.config.canvas,
 			container: this.config.container,
 			dpr: this.dpr,
@@ -60,7 +69,7 @@ export class ScrollSequenceEngine {
 
 		if (this.activeBreakpoint) {
 			const first = this.activeBreakpoint.frames[0]?.image || this.activeBreakpoint.fallbackFrame || null;
-			this.canvasRender.drawFrame(first, this.activeBreakpoint.fallbackFrame || null);
+			this.emitter.emit("drawFrame", first, this.activeBreakpoint.fallbackFrame || null);
 		}
 
 		if (this.loadingConfig?.loadingMode === "lazy" && !fallbackOnly) {
@@ -115,13 +124,15 @@ export class ScrollSequenceEngine {
 			lazyLoadAroundFrame: fallbackOnly ? undefined : () => {},
 		});
 
-		if (!this.config.container) return;
+		this.resizeObserver = new ResizeObserver(() => {
+			this.resize();
+		});
+		this.resizeObserver.observe(this.config.container);
 
-		if (this.config.container) {
-			this.resizeObserver = new ResizeObserver(() => {
-				this.resize();
+		if(this.emitter){
+			this.emitter.subscribe("frameLoaded", (frame: Frame) => {
+				this.loadingConfig?.onFrameLoaded?.(frame);
 			});
-			this.resizeObserver.observe(this.config.container);
 		}
 	};
 
@@ -130,33 +141,38 @@ export class ScrollSequenceEngine {
 			throw new Error("ScrollSequence: assetsConfig is required and must be an array. Please check your options.");
 		}
 		this.breakpoints = this.normalizeBreakpoints(this.config.assetsConfig);
-		this.activeBreakpointManager = new ActiveBreakpoint(this.breakpoints);
-		this.activeBreakpointManager.init();
-		this.activeBreakpoint = this.activeBreakpointManager.getActive();
-		this.activeBreakpointManager.subscribe(async (breakpoint) => {
+		this.activeBreakpointManager = new ActiveBreakpoint(this.breakpoints, this.emitter);
+		
+		this.emitter.subscribe("breakpointChanged",async (breakpoint: BreakpointConfig) => {
 			this.activeBreakpoint = breakpoint;
 
 			this.normalizeFramesRange(this.activeBreakpoint);
 			this.initFramesLoadingManager();
 			await this.initFramesLoadings();
 			if(this.clearCacheOnBreakpointChange){
-				this.breakpoints.forEach((breakpoint) => {
-					if (breakpoint.name !== this.activeBreakpoint?.name) {
-						breakpoint.frames.forEach((frame) => {
-							if (!frame || !frame.image) return;
+				this.clearUnactiveBreakpoints();
+			}
+		});
+		this.activeBreakpointManager.init();
+	};
 
-							if (frame.image.src.startsWith("blob:")) {
-								URL.revokeObjectURL(frame.image.src);
-							}
+	clearUnactiveBreakpoints = () => {
+		if(!this.activeBreakpoint) return;
+			this.breakpoints.forEach((breakpoint) => {
+				if (breakpoint.name !== this.activeBreakpoint?.name) {
+					breakpoint.frames.forEach((frame) => {
+					if (!frame || !frame.image) return;
 
-							frame.image.src = "";
-							frame.image.onload = null;
-							frame.image.onerror = null;
-							frame.image = null;
-						});
-						breakpoint.frames = [];
+					if (frame.image.src.startsWith("blob:")) {
+						URL.revokeObjectURL(frame.image.src);
 					}
+
+					frame.image.src = "";
+					frame.image.onload = null;
+					frame.image.onerror = null;
+					frame.image = null;
 				});
+				breakpoint.frames = [];
 			}
 		});
 	};
@@ -217,7 +233,6 @@ export class ScrollSequenceEngine {
 			trigger: normalizedTrigger,
 			start: loadingConfig?.start ?? "top top",
 			markers: loadingConfig?.markers ?? false,
-			onFrameLoaded: loadingConfig?.onFrameLoaded,
 			maxRetries: loadingConfig?.maxRetries ?? 3,
 			retryDelay: loadingConfig?.retryDelay ?? 200,
 		};
@@ -226,12 +241,12 @@ export class ScrollSequenceEngine {
 	initFramesLoadingManager = () => {
 		if (!this.activeBreakpoint) return;
 		this.frameLoaderManager = new FrameLoader({
+			emitter: this.emitter,
 			activeBreakpoint: this.activeBreakpoint,
 			firstFrame: this.firstFrame,
 			lastFrame: this.lastFrame,
 			preloadCount: this.loadingConfig?.preloadCount ?? this.minFramesToPreload,
 			networkPolicy: this.config.networkPolicy,
-			onFrameLoaded: this.loadingConfig?.onFrameLoaded,
 			maxRetries: this.loadingConfig?.maxRetries ?? 3,
 			retryDelay: this.loadingConfig?.retryDelay ?? 200,
 		});
@@ -246,7 +261,7 @@ export class ScrollSequenceEngine {
 		const fallback = this.activeBreakpoint?.fallbackFrame;
 
 		if (!frame?.image && !fallback) return; // nothing to draw yet
-		this.canvasRender.drawFrame(frame?.image || null, this.activeBreakpoint.fallbackFrame);
+		this.emitter.emit("drawFrame", frame?.image || null, this.activeBreakpoint.fallbackFrame);
 	};
 
 	resize = () => {
