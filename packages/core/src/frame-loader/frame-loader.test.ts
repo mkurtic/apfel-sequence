@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FrameLoader } from "./frame-loader";
 import type { BreakpointConfig } from "../types/scrollSequence";
 
+vi.mock("gsap/dist/ScrollTrigger", () => ({
+	ScrollTrigger: {
+		create: vi.fn(),
+	},
+}));
+
 describe("FrameLoader", () => {
 	let mockBreakpoint: BreakpointConfig;
 	let frameLoader: FrameLoader;
@@ -18,7 +24,7 @@ describe("FrameLoader", () => {
 			framePrefix: "frame_",
 		};
 
-		// Mock <img /> constructor
+		// Mock <img /> constructor default behavior (success)
 		global.Image = class {
 			src = "";
 			onload: (() => void) | null = null;
@@ -238,7 +244,6 @@ describe("FrameLoader", () => {
 		});
 	});
 
-	// TODO: Add retry logic tests, dont understand how to test this properly
 
 	describe("Mixed Sequential and Parallel Loading", () => {
 		it("should handle mixed sequential and parallel requests correctly", async () => {
@@ -310,6 +315,167 @@ describe("FrameLoader", () => {
 			expect(call.endTime).toBeGreaterThanOrEqual(call.startTime);
 			
 			vi.useFakeTimers();
+		});
+	});
+
+	describe("Retry Logic", () => {
+		it("should retry failed frames up to maxRetries", async () => {
+			const onFrameLoaded = vi.fn();
+			let attempts = 0;
+
+			// Override Image to fail
+			global.Image = class {
+				src = "";
+				onload: any = null;
+				onerror: any = null;
+				complete = false;
+				decode = vi.fn();
+				constructor() {
+					attempts++;
+					setTimeout(() => {
+						if (this.onerror) this.onerror(new Error("Network Error"));
+					}, 10);
+				}
+			} as any;
+
+			frameLoader = new FrameLoader({
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 10,
+				preloadCount: 5,
+				maxRetries: 3,
+				retryDelay: 100,
+				onFrameLoaded,
+			});
+
+			const loadPromise = frameLoader.loadFrame(1, "parallel");
+
+			// 1st attempt
+			await vi.advanceTimersByTimeAsync(20); 
+			// Wait for retry delay
+			await vi.advanceTimersByTimeAsync(100);
+			// 2nd attempt
+			await vi.advanceTimersByTimeAsync(20);
+			// Wait for retry delay
+			await vi.advanceTimersByTimeAsync(100);
+			// 3rd attempt
+			await vi.advanceTimersByTimeAsync(20);
+
+			await loadPromise;
+
+			expect(attempts).toBe(3);
+			expect(mockBreakpoint.frames[0]?.status).toBe("error");
+			expect(onFrameLoaded).toHaveBeenCalledWith(expect.objectContaining({ status: "error", attempts: 3 }));
+		});
+
+		it("should succeed if retry succeeds", async () => {
+			const onFrameLoaded = vi.fn();
+			let attempts = 0;
+
+			// Fail first time, succeed second
+			global.Image = class {
+				src = "";
+				onload: any = null;
+				onerror: any = null;
+				complete = false;
+				// decode intentionally undefined
+				constructor() {
+					attempts++;
+					setTimeout(() => {
+						// Fail on 1st attempt
+						if (attempts === 1) {
+							if (this.onerror) this.onerror(new Error("Fail"));
+						} else {
+							// Succeed on 2nd
+							this.complete = true;
+							if (this.onload) this.onload();
+						}
+					}, 5);
+				}
+			} as any;
+
+			frameLoader = new FrameLoader({
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 10,
+				preloadCount: 5,
+				maxRetries: 3,
+				retryDelay: 10,
+				onFrameLoaded,
+			});
+
+			const loadPromise = frameLoader.loadFrame(1, "parallel");
+
+			// 1st attempt (fail)
+			await vi.advanceTimersByTimeAsync(10);
+			// Retry delay
+			await vi.advanceTimersByTimeAsync(20);
+			// 2nd attempt (success)
+			await vi.advanceTimersByTimeAsync(10);
+
+			await loadPromise;
+
+			expect(attempts).toBeGreaterThanOrEqual(2);
+			expect(mockBreakpoint.frames[0]?.status).toBe("success");
+			expect(mockBreakpoint.frames[0]?.attempts).toBeGreaterThanOrEqual(2);
+		});
+	});
+
+	describe("Lazy Loading", () => {
+		it("should init ScrollTrigger and load neighbors on update", async () => {
+			const onFrameLoaded = vi.fn();
+			frameLoader = new FrameLoader({
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 10,
+				preloadCount: 0, 
+				maxRetries: 1,
+				retryDelay: 0,
+				onFrameLoaded
+			});
+
+			// Spy on loadFrame
+			const loadFrameSpy = vi.spyOn(frameLoader, 'loadFrame');
+
+			let onUpdateCallback: any;
+			(ScrollTrigger.create as any).mockImplementation((config: any) => {
+				onUpdateCallback = config.onUpdate;
+				return { kill: vi.fn() };
+			});
+
+			frameLoader.initLazyLoading("#test");
+
+			expect(ScrollTrigger.create).toHaveBeenCalled();
+			expect(onUpdateCallback).toBeDefined();
+
+			// Simulate scroll to 50% (frame ~5)
+			// Total frames 10 (1-10). Index from 0-9. 0.5 * 9 = 4.5 -> floor = 4 -> Frame 5.
+			onUpdateCallback({ progress: 0.5 });
+			
+			// Should trigger loadFrame for neighbors
+			expect(loadFrameSpy).toHaveBeenCalled();
+		});
+	});
+
+	describe("Preloading", () => {
+		it("should preload the specified number of frames", async () => {
+			frameLoader = new FrameLoader({
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 10,
+				preloadCount: 3, 
+				maxRetries: 1,
+				retryDelay: 0,
+			});
+
+			const spy = vi.spyOn(frameLoader, 'loadFrame');
+
+			await frameLoader.preloadInitialFrames();
+
+			expect(spy).toHaveBeenCalledTimes(3);
+			expect(spy).toHaveBeenCalledWith(1);
+			expect(spy).toHaveBeenCalledWith(2);
+			expect(spy).toHaveBeenCalledWith(3);
 		});
 	});
 });
