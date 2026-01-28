@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { CanvasRender } from "./canvas-render";
+import { Emitter } from "../utils/emitter/emitter";
 import * as scaleToCoverModule from "../utils/canvas/scaleToCover";
 import * as scaleToContainModule from "../utils/canvas/scaleToContain";
 
@@ -42,6 +43,7 @@ describe("CanvasRender", () => {
 
   it("should initialize with provided configuration", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -52,6 +54,7 @@ describe("CanvasRender", () => {
 
   it("should resize canvas based on container and DPR on first draw", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -68,6 +71,7 @@ describe("CanvasRender", () => {
 
   it("should use scaleToCover when drawMode is 'cover'", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -82,6 +86,7 @@ describe("CanvasRender", () => {
 
   it("should use scaleToContain when drawMode is 'contain' or undefined", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -96,6 +101,7 @@ describe("CanvasRender", () => {
 
   it("should update canvas size if container size changes", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -117,6 +123,7 @@ describe("CanvasRender", () => {
 
   it("should store lastDrawnFrame and use it if no new frame is provided", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -138,6 +145,7 @@ describe("CanvasRender", () => {
 
   it("should use fallback if no frame and no lastDrawnFrame", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,
@@ -152,6 +160,7 @@ describe("CanvasRender", () => {
 
   it("should not draw anything if no inputs provided", () => {
     const render = new CanvasRender({
+      emitter: new Emitter(),
       canvas,
       container,
       dpr,

@@ -2,10 +2,12 @@ import { getFrameHref } from "../utils/url-resolvers/getFrameHref";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import type { BreakpointConfig, FrameLoaderProps, NetworkPolicy, Frame } from "../types/scrollSequence";
+import { Emitter } from "../utils/emitter/emitter";
 gsap.registerPlugin(ScrollTrigger);
 
 class FrameLoader {
 	private firstFrameLoaded: boolean = false;
+	private emitter: Emitter;
 	private activeBreakpoint: BreakpointConfig;
 	private firstFrame: number;
 	private lastFrame: number;
@@ -13,18 +15,17 @@ class FrameLoader {
 	private networkPolicy: NetworkPolicy | undefined;
 	private loadingFrames: Set<number> = new Set();
 	private lazyLoadingTL: ScrollTrigger | null = null;
-	private onFrameLoaded?: (stat: Frame) => void;
 	private maxRetries: number;
 	private retryDelay: number;
 	private queue: { frameNumber: number; resolve: () => void; reject: (err: unknown) => void }[] = [];
 	private isProcessing: boolean = false;
 	constructor(config: FrameLoaderProps) {
+		this.emitter = config.emitter;
 		this.activeBreakpoint = config.activeBreakpoint;
 		this.firstFrame = config.firstFrame;
 		this.lastFrame = config.lastFrame;
 		this.preloadCount = config.preloadCount;
 		this.networkPolicy = config.networkPolicy;
-		this.onFrameLoaded = config.onFrameLoaded;
 		this.maxRetries = config.maxRetries;
 		this.retryDelay = config.retryDelay;
 	}
@@ -90,12 +91,11 @@ class FrameLoader {
 					url: src,
 					image: img,
 					attempts: attempt,
+					index: index,
 				};
-				if (this.onFrameLoaded) this.onFrameLoaded(stat);
-				console.log("Frame loaded:", stat);
-
 				this.activeBreakpoint.frames[index] = stat;
 				this.loadingFrames.delete(index);
+				this.emitter.emit("frameLoaded", stat);
 				return;
 			} catch (error) {
 				lastError = error;
@@ -110,9 +110,8 @@ class FrameLoader {
 						url: src,
 						image: null,
 						attempts: attempt,
+						index: index,
 					};
-					console.warn(`Frame load failed (attempt ${attempt}/${this.maxRetries}):`, stat);
-
 					await new Promise((resolve) => setTimeout(resolve, this.retryDelay));
 					continue;
 				}
@@ -130,9 +129,9 @@ class FrameLoader {
 			url: src,
 			image: null,
 			attempts: this.maxRetries,
+			index: index,
 		};
-		if (this.onFrameLoaded) this.onFrameLoaded(stat);
-		console.error("Frame failed to load:", stat);
+		this.emitter.emit("frameFailed", stat);
 
 		this.activeBreakpoint.frames[index] = stat;
 		this.loadingFrames.delete(index);

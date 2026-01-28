@@ -202,7 +202,6 @@ You can control how frames are loaded (e.g., eager vs lazy, retry logic) using t
 | `maxRetries` | `number` | `3` | Attempts to retry failed frames. |
 | `retryDelay` | `number` | `200` | Delay (ms) between retries. |
 | `preloadCount` | `number` | (calculated) | Number of frames to force-load initially to be always ahead of the current scroll position of the users. |
-| `onFrameLoaded` | `function` | - | Callback `(stat) => void` for tracking load status. |
 
 ### Loading Strategy
 1.  **Sequential (Passive)**: Initial & progressive loading happens one-by-one to save bandwidth.
