@@ -110,8 +110,6 @@ export class ScrollSequenceEngine {
 		this.scrollConfig = this.normalizeScrollConfig(config.scrollConfig);
 		this.loadingConfig = this.normalizeLoadingConfig(config.loadingConfig);
 
-		
-
 		this.scrollEngine = new ScrollEngine({
 			containerRef: config.container,
 			totalFrames: fallbackOnly ? 1 : this.totalFrames,
@@ -149,6 +147,7 @@ export class ScrollSequenceEngine {
 			this.normalizeFramesRange(this.activeBreakpoint);
 			this.initFramesLoadingManager();
 			await this.initFramesLoadings();
+			
 			if(this.clearCacheOnBreakpointChange){
 				this.clearUnactiveBreakpoints();
 			}
@@ -190,7 +189,7 @@ export class ScrollSequenceEngine {
 		return [firstFrame, lastFrame, totalFrames];
 	};
 
-	normalizeFramesRange = (activeBreakpoint: BreakpointConfig) => {
+	normalizeFramesRange = (activeBreakpoint: BreakpointConfig): void => {
 		const [firstFrame, lastFrame, totalFrames] = this.getNormalizedFramesRange(activeBreakpoint);
 		this.firstFrame = firstFrame;
 		this.lastFrame = lastFrame;
