@@ -1,9 +1,7 @@
 import { getFrameHref } from "../utils/url-resolvers/getFrameHref";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import type { BreakpointConfig, FrameLoaderProps, NetworkPolicy, Frame } from "../types/scrollSequence";
 import { Emitter } from "../utils/emitter/emitter";
-gsap.registerPlugin(ScrollTrigger);
+import { ScrollScrub } from "../scroll-engine/scroll-trigger";
 
 class FrameLoader {
 	private firstFrameLoaded: boolean = false;
@@ -14,7 +12,7 @@ class FrameLoader {
 	private preloadCount: number;
 	private networkPolicy: NetworkPolicy | undefined;
 	private loadingFrames: Set<number> = new Set();
-	private lazyLoadingTL: ScrollTrigger | null = null;
+	private lazyLoadingTL: ScrollScrub | null = null;
 	private maxRetries: number;
 	private retryDelay: number;
 	private queue: { frameNumber: number; resolve: () => void; reject: (err: unknown) => void }[] = [];
@@ -197,21 +195,23 @@ class FrameLoader {
 		markers: boolean = false
 	): void => {
 		const totalFrames = this.lastFrame - this.firstFrame + 1;
-		if (!trigger) return;
-		this.lazyLoadingTL?.kill();
-		this.lazyLoadingTL = ScrollTrigger.create({
-			trigger: trigger,
+		const triggerEl = typeof trigger === "string" ? document.querySelector<HTMLElement>(trigger) : trigger;
+		if (!triggerEl) return;
+
+		this.lazyLoadingTL?.destroy();
+		this.lazyLoadingTL = new ScrollScrub({
+			trigger: triggerEl,
 			start,
 			end,
 			scrub,
-			markers,
-			onUpdate: (self) => {
-				const frameIndex = Math.floor(self.progress * (totalFrames - 1));
+			onUpdate: ({ progress }) => {
+				const frameIndex = Math.floor(progress * (totalFrames - 1));
 				if (this.lazyLoadAroundFrame) {
 					this.lazyLoadAroundFrame(frameIndex);
 				}
 			},
 		});
+		this.lazyLoadingTL.init();
 	};
 
 	async preloadInitialFrames(): Promise<void> {
@@ -225,7 +225,7 @@ class FrameLoader {
 
 	destroy(): void {
 		if (this.lazyLoadingTL) {
-			this.lazyLoadingTL.kill();
+			this.lazyLoadingTL.destroy();
 			this.lazyLoadingTL = null;
 		}
 		this.loadingFrames.clear();

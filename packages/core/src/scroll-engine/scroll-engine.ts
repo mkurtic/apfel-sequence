@@ -1,11 +1,8 @@
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import type { ScrollEngineProps } from "../types/scrollSequence";
-
-gsap.registerPlugin(ScrollTrigger);
+import { ScrollScrub } from "./scroll-trigger";
 
 export class ScrollEngine {
-	private tl: gsap.core.Timeline | null = null;
+	private scrub: ScrollScrub | null = null;
 	private lastFrame: number = -1;
 	private props: ScrollEngineProps;
 
@@ -15,44 +12,34 @@ export class ScrollEngine {
 	}
 
 	public init(): void {
-		const { containerRef, totalFrames, onFrameChange, start = "top top", end = "100%", scrub = true, markers = false } = this.props;
+		const { containerRef, totalFrames, onFrameChange, start = "top top", end = "bottom top", scrub = true } = this.props;
 
 		const element = containerRef;
 		if (!element) return;
 
-		// Clean up
 		this.destroy();
 
-		this.tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: element,
-				start,
-				end,
-				scrub,
-				markers,
-				onUpdate: (self) => {
-					const frameIndex = Math.floor(self.progress * (totalFrames - 1));
-					if (frameIndex !== this.lastFrame) {
-						this.lastFrame = frameIndex;
-						onFrameChange(frameIndex);
-					}
-				},
+		this.scrub = new ScrollScrub({
+			trigger: element,
+			start,
+			end,
+			scrub,
+			onUpdate: ({ progress }) => {
+				const frameIndex = Math.floor(progress * (totalFrames - 1));
+				if (frameIndex !== this.lastFrame) {
+					this.lastFrame = frameIndex;
+					onFrameChange(frameIndex);
+				}
 			},
 		});
+
+		this.scrub.init();
 	}
 
 	public destroy(): void {
-		if (this.tl) {
-			this.tl.kill();
-			this.tl = null;
-		}
-
-		if (this.props.containerRef) {
-			ScrollTrigger.getAll().forEach((t) => {
-				if (t.vars.trigger === this.props.containerRef) {
-					t.kill();
-				}
-			});
+		if (this.scrub) {
+			this.scrub.destroy();
+			this.scrub = null;
 		}
 	}
 }

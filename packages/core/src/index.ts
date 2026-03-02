@@ -5,11 +5,9 @@ import { ScrollEngine } from "./scroll-engine/scroll-engine";
 import { ActiveBreakpoint } from "./active-breakpoint/active-breakpoint";
 import resolveFallbackFrameUrl from "./utils/url-resolvers/resolveFallbackUrls";
 import { FrameLoader } from "./frame-loader/frame-loader";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollScrub } from "./scroll-engine/scroll-trigger";
 import { CanvasRender } from "./canvas-render/canvas-render";
 import { Emitter } from "./utils/emitter/emitter";
-gsap.registerPlugin(ScrollTrigger);
 
 export class ScrollSequenceEngine {
 	private scrollEngine: ScrollEngine | null = null;
@@ -26,7 +24,7 @@ export class ScrollSequenceEngine {
 	private lastFrame: number = 2;
 	private totalFrames: number = 1;
 	private frameLoaderManager: FrameLoader | null = null;
-	private tlPreloadFirstChunk: ScrollTrigger | null = null;
+	private tlPreloadFirstChunk: ScrollScrub | null = null;
 	private prefersReducedMotion: PrefersReducedMotion | null = null;
 	private dpr: number = 1;
 	private resizeObserver: ResizeObserver | null = null;
@@ -75,17 +73,27 @@ export class ScrollSequenceEngine {
 		if (this.loadingConfig?.loadingMode === "lazy" && !fallbackOnly) {
 			if (this.loadingConfig.trigger) {
 				if (this.tlPreloadFirstChunk) {
-					this.tlPreloadFirstChunk.kill();
+					this.tlPreloadFirstChunk.destroy();
 				}
-				this.tlPreloadFirstChunk = ScrollTrigger.create({
-					trigger: this.loadingConfig.trigger,
-					start: this.loadingConfig.start,
-					markers: this.loadingConfig.markers,
-					once: true,
-					onEnter: async () => {
-						await this.frameLoaderManager?.preloadInitialFrames();
-					},
-				});
+				const triggerEl =
+					typeof this.loadingConfig.trigger === "string"
+						? document.querySelector<HTMLElement>(this.loadingConfig.trigger)
+						: this.loadingConfig.trigger;
+				if (triggerEl) {
+					this.tlPreloadFirstChunk = new ScrollScrub({
+						trigger: triggerEl,
+						start: this.loadingConfig.start,
+						end: "100%",
+						onUpdate: () => {},
+						onEnter: async () => {
+							await this.frameLoaderManager?.preloadInitialFrames();
+							// One-shot: destroy after first fire
+							this.tlPreloadFirstChunk?.destroy();
+							this.tlPreloadFirstChunk = null;
+						},
+					});
+					this.tlPreloadFirstChunk.init();
+				}
 				this.frameLoaderManager.initLazyLoading(
 					this.loadingConfig.trigger,
 					this.loadingConfig.start,
@@ -268,7 +276,7 @@ export class ScrollSequenceEngine {
 	};
 
 	destroy = () => {
-		this.tlPreloadFirstChunk?.kill();
+		this.tlPreloadFirstChunk?.destroy();
 		this.scrollEngine?.destroy();
 		this.frameLoaderManager?.destroy();
 
