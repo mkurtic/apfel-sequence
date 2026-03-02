@@ -1,0 +1,105 @@
+import { scrollScrubTicker } from "./scroll-scrub-ticker";
+
+export type ScrollScrubCallback = {
+	progress: number;
+};
+
+export type OffsetKeyword = "top" | "center" | "bottom";
+export type OffsetToken = OffsetKeyword | `${number}%` | `${number}px`;
+export type ScrollOffset = `${OffsetToken} ${OffsetToken}` | (string & {});
+
+export type ScrollScrubProps = {
+	trigger: HTMLElement;
+	start?: ScrollOffset;
+	end?: ScrollOffset;
+	scrub?: boolean;
+	onUpdate: (self: ScrollScrubCallback) => void;
+	onEnter?: () => void;
+	onLeave?: () => void;
+	onEnterBack?: () => void;
+	onLeaveBack?: () => void;
+};
+
+function parseOffset(positionStr: string = "top top", elementSize: number, viewportSize: number): number {
+	const [elementSide, viewportSide] = positionStr.trim().split(/\s+/);
+
+	const resolveValue = (token: string = "top", size: number): number => {
+		if (token === "top") return 0;
+		if (token === "center") return size / 2;
+		if (token === "bottom") return size;
+		if (token.endsWith("%")) return (parseFloat(token) / 100) * size;
+		if (token.endsWith("px")) return parseFloat(token);
+		return 0;
+	};
+
+	return resolveValue(elementSide, elementSize) - resolveValue(viewportSide, viewportSize);
+}
+
+export class ScrollScrub {
+	private props: ScrollScrubProps;
+	private observer: IntersectionObserver | null = null;
+	private lastProgress: number = -1;
+
+	private readonly tick: () => void;
+
+	constructor(props: ScrollScrubProps) {
+		this.props = props;
+		this.tick = this.update.bind(this); // Bind once so the same reference is used for register/unregister
+	}
+
+	init = (): void => {
+		scrollScrubTicker.register(this.tick);
+
+		this.observer = new IntersectionObserver(
+			(entries) => {
+				const entry = entries[0];
+				if (entry.isIntersecting) {
+					scrollScrubTicker.activate(this.tick);
+				} else {
+					this.update();
+					scrollScrubTicker.deactivate(this.tick);
+				}
+			},
+			{ rootMargin: "10px 0px 10px 0px" }
+		);
+
+		this.observer.observe(this.props.trigger);
+	};
+
+	update = (): void => {
+		const { trigger, start = "top top", end = "bottom top", onUpdate, onEnter, onLeave, onEnterBack, onLeaveBack } = this.props;
+
+		const rect = trigger.getBoundingClientRect();
+		const vh = window.innerHeight;
+		const elementHeight = rect.height;
+		const elementTop = rect.top + window.scrollY;
+
+		const startOffset = parseOffset(start, elementHeight, vh);
+		const endOffset = parseOffset(end, elementHeight, vh);
+		const animationLength = (elementTop + endOffset) - (elementTop + startOffset);
+
+		if (animationLength <= 0) return;
+
+		const rawProgress = (window.scrollY - (elementTop + startOffset)) / animationLength;
+		const progress = Math.min(1, Math.max(0, rawProgress));
+
+		// Directional callbacks — fire only at boundary crossings
+		if (progress > 0 && this.lastProgress <= 0) onEnter?.();
+		if (progress >= 1 && this.lastProgress < 1) onLeave?.();
+		if (progress < 1 && this.lastProgress >= 1) onEnterBack?.();
+		if (progress <= 0 && this.lastProgress > 0) onLeaveBack?.();
+
+		if (progress !== this.lastProgress) {
+			this.lastProgress = progress;
+			onUpdate({ progress });
+		}
+	};
+
+	destroy = (): void => {
+		scrollScrubTicker.unregister(this.tick);
+		if (this.observer) {
+			this.observer.disconnect();
+			this.observer = null;
+		}
+	};
+}

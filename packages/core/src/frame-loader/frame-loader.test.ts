@@ -3,13 +3,16 @@ import { FrameLoader } from "./frame-loader";
 import type { BreakpointConfig } from "../types/scrollSequence";
 import { Emitter } from "../utils/emitter/emitter";
 
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-
-vi.mock("gsap/dist/ScrollTrigger", () => ({
-	ScrollTrigger: {
-		create: vi.fn(),
-	},
+const mockScrollScrubInstances: any[] = [];
+vi.mock("../scroll-engine/scroll-trigger", () => ({
+	ScrollScrub: vi.fn().mockImplementation(function (this: any, props: any) {
+		this.init = vi.fn();
+		this.destroy = vi.fn();
+		this._props = props;
+		mockScrollScrubInstances.push(this);
+	}),
 }));
+
 
 describe("FrameLoader", () => {
 	let mockBreakpoint: BreakpointConfig;
@@ -435,37 +438,35 @@ describe("FrameLoader", () => {
 	});
 
 	describe("Lazy Loading", () => {
-		it("should init ScrollTrigger and load neighbors on update", async () => {
-			const onFrameLoaded = vi.fn();
+		it("should init ScrollScrub and load neighbors on update", async () => {
+			const { ScrollScrub } = await import("../scroll-engine/scroll-trigger");
+			// Clear any instances from previous tests
+			mockScrollScrubInstances.length = 0;
+
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
-				preloadCount: 0, 
+				preloadCount: 0,
 				maxRetries: 1,
 				retryDelay: 0,
 			});
-			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
-			// Spy on loadFrame
 			const loadFrameSpy = vi.spyOn(frameLoader, 'loadFrame');
 
-			let onUpdateCallback: any;
-			(ScrollTrigger.create as any).mockImplementation((config: any) => {
-				onUpdateCallback = config.onUpdate;
-				return { kill: vi.fn() };
-			});
+			// Create a fake trigger element
+			const triggerEl = document.createElement("div");
+			frameLoader.initLazyLoading(triggerEl);
 
-			frameLoader.initLazyLoading("#test");
+			// ScrollScrub should have been instantiated
+			expect(ScrollScrub).toHaveBeenCalled();
+			expect(mockScrollScrubInstances.length).toBeGreaterThan(0);
 
-			expect(ScrollTrigger.create).toHaveBeenCalled();
-			expect(onUpdateCallback).toBeDefined();
+			// Get the instance and simulate a scroll update at 50%
+			const instance = mockScrollScrubInstances[mockScrollScrubInstances.length - 1];
+			instance._props.onUpdate({ progress: 0.5 });
 
-			// Simulate scroll to 50% (frame ~5)
-			// Total frames 10 (1-10). Index from 0-9. 0.5 * 9 = 4.5 -> floor = 4 -> Frame 5.
-			onUpdateCallback({ progress: 0.5 });
-			
 			// Should trigger loadFrame for neighbors
 			expect(loadFrameSpy).toHaveBeenCalled();
 		});

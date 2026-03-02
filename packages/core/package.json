@@ -18,8 +18,7 @@
 		"engine",
 		"canvas",
 		"animation",
-		"scroll-trigger",
-		"gsap"
+		"scroll-trigger"
 	],
 	"publishConfig": {
 		"access": "public"
@@ -35,12 +34,11 @@
 			"require": "./dist/index.cjs"
 		}
 	},
-	"dependencies": {
-		"gsap": "^3.14.2"
-	},
+	"dependencies": {},
 	"scripts": {
 		"build": "tsup",
-		"dev": "tsup --watch"
+		"dev": "tsup --watch",
+		"test": "vitest run"
 	},
 	"devDependencies": {
 		"jsdom": "^27.4.0",

@@ -16,7 +16,6 @@
 		"canvas",
 		"animation",
 		"scroll-trigger",
-		"gsap",
 		"image-sequence",
 		"performance"
 	],
@@ -51,7 +50,5 @@
 		"vite-plugin-dts": "^4.5.4",
 		"vitest": "^4.0.16"
 	},
-	"dependencies": {
-		"gsap": "^3.14.2"
-	}
+	"dependencies": {}
 }
