@@ -48,6 +48,8 @@ export class ScrollScrub {
 	}
 
 	init = (): void => {
+		if (typeof window === "undefined") return;
+
 		scrollScrubTicker.register(this.tick);
 
 		this.observer = new IntersectionObserver(
@@ -67,6 +69,8 @@ export class ScrollScrub {
 	};
 
 	update = (): void => {
+		if (typeof window === "undefined") return;
+
 		const { trigger, start = "top top", end = "bottom top", onUpdate, onEnter, onLeave, onEnterBack, onLeaveBack } = this.props;
 
 		const rect = trigger.getBoundingClientRect();
