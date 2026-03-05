@@ -1,6 +1,6 @@
-import { ScrollSequenceEngine } from "@scroll-sequence/core";
-import type { ScrollSequenceProps } from "@scroll-sequence/core";
+import { ApfelSequenceEngine } from "@apfel-sequence/core";
+import type { ApfelSequenceProps } from "@apfel-sequence/core";
 
-export default function ScrollSequence(options: ScrollSequenceProps) {
-	return new ScrollSequenceEngine(options);
+export default function ApfelSequence(options: ApfelSequenceProps) {
+	return new ApfelSequenceEngine(options);
 }

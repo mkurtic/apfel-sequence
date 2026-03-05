@@ -1,18 +1,18 @@
 {
-	"name": "scroll-sequence-monorepo",
+	"name": "apfel-sequence-monorepo",
 	"private": true,
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mkurtic/scroll-sequence.git"
+		"url": "https://github.com/mkurtic/apfel-sequence.git"
 	},
 	"bugs": {
-		"url": "https://github.com/mkurtic/scroll-sequence/issues"
+		"url": "https://github.com/mkurtic/apfel-sequence/issues"
 	},
-	"homepage": "https://github.com/mkurtic/scroll-sequence#readme",
+	"homepage": "https://github.com/mkurtic/apfel-sequence#readme",
 	"keywords": [
-		"scroll-sequence",
+		"apfel-sequence",
 		"canvas",
 		"animation",
 		"scroll-trigger",
@@ -24,15 +24,15 @@
 		"playgrounds/astro"
 	],
 	"scripts": {
-		"build:core": "npm run build -w @scroll-sequence/core",
+		"build:core": "npm run build -w @apfel-sequence/core",
 		"build:vanilla": "npm exec -- vite build --config packages/vanilla/vite.config.ts",
 		"build:react": "vite build --config packages/react/vite.config.ts",
 		"build:vue": "npm exec -- vite build --config packages/vue/vite.config.ts",
 		"build:all": "npm run build:core && npm run build:vanilla && npm run build:react && npm run build:vue",
-		"dev:core": "npm run dev -w @scroll-sequence/core",
-		"dev:vanilla": "npm run dev -w @scroll-sequence/vanilla",
-		"dev:react": "npm run dev -w @scroll-sequence/react",
-		"dev:vue": "npm run dev -w @scroll-sequence/vue",
+		"dev:core": "npm run dev -w @apfel-sequence/core",
+		"dev:vanilla": "npm run dev -w @apfel-sequence/vanilla",
+		"dev:react": "npm run dev -w @apfel-sequence/react",
+		"dev:vue": "npm run dev -w @apfel-sequence/vue",
 		"dev": "concurrently \"npm run dev:core\" \"npm run dev:vanilla\" \"npm run dev:react\" \"npm run dev:vue\"",
 		"test": "vitest run --config packages/core/vitest.config.mts --reporter=verbose --pool=forks",
 		"test:watch": "vitest --config packages/core/vitest.config.mts --watch",

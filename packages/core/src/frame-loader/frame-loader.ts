@@ -1,5 +1,5 @@
 import { getFrameHref } from "../utils/url-resolvers/getFrameHref";
-import type { BreakpointConfig, FrameLoaderProps, NetworkPolicy, Frame } from "../types/scrollSequence";
+import type { BreakpointConfig, FrameLoaderProps, NetworkPolicy, Frame } from "../types/apfelSequence";
 import { Emitter } from "../utils/emitter/emitter";
 import { ScrollScrub } from "../scroll-engine/scroll-trigger";
 

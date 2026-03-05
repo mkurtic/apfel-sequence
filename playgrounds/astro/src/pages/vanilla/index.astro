@@ -4,21 +4,21 @@ import Layout from "../../layouts/Layout.astro";
 <Layout>
   <section id="hero">
 		<div id="canvas-container">
-  		<canvas class="scroll-sequence" id="canvas"></canvas>
+  		<canvas class="apfel-sequence" id="canvas"></canvas>
     </div>
   </section>
   <section id="section-2">
 		<div id="canvas-container-2">
-  		<canvas class="scroll-sequence" id="canvas-2"></canvas>
+  		<canvas class="apfel-sequence" id="canvas-2"></canvas>
     </div>
   </section>
   <section></section>
 </Layout>
 <script>
-import ScrollSequence from "@scroll-sequence/vanilla";
+import ApfelSequence from "@apfel-sequence/vanilla";
 import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
 
-const scrollSequenceHero = ScrollSequence({
+const apfelSequenceHero = ApfelSequence({
   canvas: document.querySelector("#canvas"),
   container: document.querySelector("#canvas-container"),
   assetsConfig: heroAssets,
@@ -26,7 +26,7 @@ const scrollSequenceHero = ScrollSequence({
 });
 
 
-const scrollSequenceSection2 = ScrollSequence({
+const apfelSequenceSection2 = ApfelSequence({
   canvas: document.querySelector("#canvas-2"),
   container: document.querySelector("#canvas-container-2"),
   assetsConfig: section2Assets,

@@ -1,4 +1,4 @@
-import type { ScrollEngineProps } from "../types/scrollSequence";
+import type { ScrollEngineProps } from "../types/apfelSequence";
 import { ScrollScrub } from "./scroll-trigger";
 
 export class ScrollEngine {

@@ -29,7 +29,7 @@ export default defineConfig([
 	{
 		entry: ["src/index.ts"],
 		format: ["iife"],
-		globalName: "ScrollSequence",
+		globalName: "ApfelSequence",
 		dts: false,
 		sourcemap: true,
 		outDir: OUT_DIR,

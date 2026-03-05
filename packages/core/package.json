@@ -1,19 +1,19 @@
 {
-	"name": "@scroll-sequence/core",
+	"name": "@apfel-sequence/core",
 	"version": "1.1.2",
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mehmedkurtic/scroll-sequence.git",
+		"url": "https://github.com/mehmedkurtic/apfel-sequence.git",
 		"directory": "packages/core"
 	},
 	"bugs": {
-		"url": "https://github.com/mehmedkurtic/scroll-sequence/issues"
+		"url": "https://github.com/mehmedkurtic/apfel-sequence/issues"
 	},
-	"homepage": "https://github.com/mehmedkurtic/scroll-sequence/tree/main/packages/core#readme",
+	"homepage": "https://github.com/mehmedkurtic/apfel-sequence/tree/main/packages/core#readme",
 	"keywords": [
-		"scroll-sequence",
+		"apfel-sequence",
 		"core",
 		"engine",
 		"canvas",

@@ -16,12 +16,12 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: path.resolve(__dirname, "src/index.ts"),
-			name: "ScrollSequenceVue",
+			name: "ApfelSequenceVue",
 			formats: ["es", "cjs"],
-			fileName: (format) => (format === "es" ? "scroll-sequence-vue.es.js" : "scroll-sequence-vue.cjs"),
+			fileName: (format) => (format === "es" ? "apfel-sequence-vue.es.js" : "apfel-sequence-vue.cjs"),
 		},
 		rollupOptions: {
-			external: ["vue", "@scroll-sequence/core"],
+			external: ["vue", "@apfel-sequence/core"],
 		},
 	},
 });

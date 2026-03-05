@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ActiveBreakpoint } from "./active-breakpoint";
 import { Emitter } from "../utils/emitter/emitter";
-import type { BreakpointConfig } from "../types/scrollSequence";
+import type { BreakpointConfig } from "../types/apfelSequence";
 
 describe("ActiveBreakpoint", () => {
 	const breakpoints: BreakpointConfig[] = [

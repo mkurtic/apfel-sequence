@@ -14,12 +14,12 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: path.resolve(__dirname, "src/index.ts"),
-			name: "ScrollSequence",
+			name: "ApfelSequence",
 			formats: ["es", "cjs"],
-			fileName: (format) => (format === "es" ? "scroll-sequence.es.js" : "scroll-sequence.cjs"),
+			fileName: (format) => (format === "es" ? "apfel-sequence.es.js" : "apfel-sequence.cjs"),
 		},
 		rollupOptions: {
-			external: ["@scroll-sequence/core"],
+			external: ["@apfel-sequence/core"],
 		},
 	},
 });

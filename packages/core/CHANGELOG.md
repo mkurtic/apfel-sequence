@@ -1,4 +1,4 @@
-# @scroll-sequence/core
+# @apfel-sequence/core
 
 ## 1.1.2
 

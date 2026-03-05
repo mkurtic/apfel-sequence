@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FrameLoader } from "./frame-loader";
-import type { BreakpointConfig } from "../types/scrollSequence";
+import type { BreakpointConfig } from "../types/apfelSequence";
 import { Emitter } from "../utils/emitter/emitter";
 
 const mockScrollScrubInstances: any[] = [];

@@ -1,4 +1,4 @@
-import type { DrawMode } from "../types/scrollSequence";
+import type { DrawMode } from "../types/apfelSequence";
 import { scaleToCover } from "../utils/canvas/scaleToCover";
 import { scaleToContain } from "../utils/canvas/scaleToContain";
 import type { Emitter } from "../utils/emitter/emitter";

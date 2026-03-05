@@ -12,17 +12,17 @@ export default defineConfig({
 				// In Development: Alias to source code for Hot Module Replacement (HMR)
 				...(process.env.NODE_ENV === "development"
 					? {
-							"@scroll-sequence/core": path.resolve("../../packages/core/src/index.ts"),
-							"scroll-sequence": path.resolve("../../packages/vanilla/src/index.ts"),
-							"@scroll-sequence/react": path.resolve("../../packages/react/src/index.tsx"),
-							"@scroll-sequence/vue": path.resolve("../../packages/vue/src/index.ts"),
+							"@apfel-sequence/core": path.resolve("../../packages/core/src/index.ts"),
+							"apfel-sequence": path.resolve("../../packages/vanilla/src/index.ts"),
+							"@apfel-sequence/react": path.resolve("../../packages/react/src/index.tsx"),
+							"@apfel-sequence/vue": path.resolve("../../packages/vue/src/index.ts"),
 					  }
 					: {
 							// In Production: Alias to built dist files (simulating NPM package usage)
-							"@scroll-sequence/core": path.resolve("../../packages/core/dist/index.esm.js"),
-							"scroll-sequence": path.resolve("../../packages/vanilla/dist/scroll-sequence.es.js"),
-							"@scroll-sequence/react": path.resolve("../../packages/react/dist/scroll-sequence-react.es.js"),
-							"@scroll-sequence/vue": path.resolve("../../packages/vue/dist/scroll-sequence-vue.es.js"),
+							"@apfel-sequence/core": path.resolve("../../packages/core/dist/index.esm.js"),
+							"apfel-sequence": path.resolve("../../packages/vanilla/dist/apfel-sequence.es.js"),
+							"@apfel-sequence/react": path.resolve("../../packages/react/dist/apfel-sequence-react.es.js"),
+							"@apfel-sequence/vue": path.resolve("../../packages/vue/dist/apfel-sequence-vue.es.js"),
 					  }),
 			},
 		},

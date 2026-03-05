@@ -16,10 +16,10 @@
 		"emitDeclarationOnly": true,
 		"baseUrl": ".",
 		"paths": {
-			"@scroll-sequence/core": ["packages/core/src"],
-			"@scroll-sequence/vanilla": ["packages/vanilla/src"],
-			"@scroll-sequence/react": ["packages/react/src"],
-			"@scroll-sequence/vue": ["packages/vue/src"],
+			"@apfel-sequence/core": ["packages/core/src"],
+			"@apfel-sequence/vanilla": ["packages/vanilla/src"],
+			"@apfel-sequence/react": ["packages/react/src"],
+			"@apfel-sequence/vue": ["packages/vue/src"],
 			"~/*": ["src/*"],
 			"test/*": ["test/*"]
 		},

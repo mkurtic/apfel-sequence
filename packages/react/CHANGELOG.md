@@ -1,11 +1,11 @@
-# @scroll-sequence/react
+# @apfel-sequence/react
 
 ## 1.1.2
 
 ### Patch Changes
 
 - Updated dependencies
-  - @scroll-sequence/core@1.1.2
+  - @apfel-sequence/core@1.1.2
 
 ## 1.1.1
 
@@ -13,7 +13,7 @@
 
 - fix: use correct ESM import for ScrollTrigger to prevent bundling issues in external builds
 - Updated dependencies
-  - @scroll-sequence/core@1.1.1
+  - @apfel-sequence/core@1.1.1
 
 ## 1.1.0
 
@@ -24,7 +24,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @scroll-sequence/core@1.1.0
+  - @apfel-sequence/core@1.1.0
 
 ## 1.0.2
 
@@ -47,4 +47,4 @@
 ### Patch Changes
 
 - Updated dependencies [5b7b7ca]
-  - @scroll-sequence/core@1.0.0
+  - @apfel-sequence/core@1.0.0

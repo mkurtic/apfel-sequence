@@ -1,6 +1,6 @@
 import { PrefersReducedMotion } from "./reduce-motion/reduce-motion";
-import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps, Frame } from "./types/scrollSequence";
-export type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ScrollSequenceProps };
+import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ApfelSequenceProps, Frame } from "./types/apfelSequence";
+export type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ApfelSequenceProps };
 import { ScrollEngine } from "./scroll-engine/scroll-engine";
 import { ActiveBreakpoint } from "./active-breakpoint/active-breakpoint";
 import resolveFallbackFrameUrl from "./utils/url-resolvers/resolveFallbackUrls";
@@ -9,9 +9,9 @@ import { ScrollScrub } from "./scroll-engine/scroll-trigger";
 import { CanvasRender } from "./canvas-render/canvas-render";
 import { Emitter } from "./utils/emitter/emitter";
 
-export class ScrollSequenceEngine {
+export class ApfelSequenceEngine {
 	private scrollEngine: ScrollEngine | null = null;
-	private config: ScrollSequenceProps;
+	private config: ApfelSequenceProps;
 	private scrollConfig?: ScrollConfig;
 	private loadingConfig?: LoadingConfig;
 	private activeBreakpointManager: ActiveBreakpoint<BreakpointConfig> | null = null;
@@ -30,7 +30,7 @@ export class ScrollSequenceEngine {
 	private resizeObserver: ResizeObserver | null = null;
 	private clearCacheOnBreakpointChange: boolean = false;
 	private emitter: Emitter;
-	constructor(config: ScrollSequenceProps) {
+	constructor(config: ApfelSequenceProps) {
 		this.emitter = new Emitter();
 		this.config = config;
 		this.breakpoints = [];
@@ -109,7 +109,7 @@ export class ScrollSequenceEngine {
 		}
 	};
 
-	init = (config: ScrollSequenceProps) => {
+	init = (config: ApfelSequenceProps) => {
 		const fallbackOnly = config.networkPolicy === "fallback-only" || this.prefersReducedMotion?.value;
 
 		if (!config.container) return;
@@ -144,7 +144,7 @@ export class ScrollSequenceEngine {
 
 	initBreakpointsManager = () => {
 		if (!this.config.assetsConfig || !Array.isArray(this.config.assetsConfig)) {
-			throw new Error("ScrollSequence: assetsConfig is required and must be an array. Please check your options.");
+			throw new Error("ApfelSequence: assetsConfig is required and must be an array. Please check your options.");
 		}
 		this.breakpoints = this.normalizeBreakpoints(this.config.assetsConfig);
 		this.activeBreakpointManager = new ActiveBreakpoint(this.breakpoints, this.emitter);

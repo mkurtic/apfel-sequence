@@ -1,4 +1,4 @@
-import type { BreakpointConfig } from "../types/scrollSequence";
+import type { BreakpointConfig } from "../types/apfelSequence";
 import type { Emitter } from "../utils/emitter/emitter";
 
 

@@ -16,12 +16,12 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: path.resolve(__dirname, "src/index.tsx"),
-			name: "ScrollSequenceReact",
+			name: "ApfelSequenceReact",
 			formats: ["es", "cjs"],
-			fileName: (format) => (format === "es" ? "scroll-sequence-react.es.js" : "scroll-sequence-react.cjs"),
+			fileName: (format) => (format === "es" ? "apfel-sequence-react.es.js" : "apfel-sequence-react.cjs"),
 		},
 		rollupOptions: {
-			external: ["react", "react-dom", "@scroll-sequence/core"],
+			external: ["react", "react-dom", "@apfel-sequence/core"],
 		},
 	},
 });

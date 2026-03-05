@@ -1,11 +1,11 @@
 ---
-import ScrollSequence from '@scroll-sequence/vue';
+import ApfelSequence from '@apfel-sequence/vue';
 import Layout from '../../layouts/Layout.astro';
 import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
 ---
 <Layout>
 	<section id="hero">
-		<ScrollSequence 
+		<ApfelSequence 
 			client:only="vue" 
 			assetsConfig={heroAssets}
 			loadingConfig={heroLoadingConfig}
@@ -13,7 +13,7 @@ import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, s
 		/>
 	</section>
 	<section id="section-2">
-		<ScrollSequence 
+		<ApfelSequence 
 			client:only="vue" 
 			assetsConfig={section2Assets}
 			loadingConfig={section2LoadingConfig}

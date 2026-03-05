@@ -1,4 +1,4 @@
-import type { AssetConfig } from "../../types/scrollSequence";
+import type { AssetConfig } from "../../types/apfelSequence";
 import { getFrameHref } from "./getFrameHref";
 
 const resolveFallbackFrameUrl = (cfg: AssetConfig): string => {

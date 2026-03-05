@@ -1,8 +1,8 @@
-# ScrollSequence
+# ApfelSequence
 
 **Smooth, light-weight, performance-optimized image sequence scrolling, do that like Apple!**
 
-ScrollSequence allows you to create high-performance frame-by-frame scroll animations (like Apple & Sony) using HTML5 Canvas. It's framework-agnostic, responsive, and designed for speed.
+ApfelSequence allows you to create high-performance frame-by-frame scroll animations (like Apple & Sony) using HTML5 Canvas. It's framework-agnostic, responsive, and designed for speed.
 
 ## Features
 
@@ -18,10 +18,10 @@ ScrollSequence allows you to create high-performance frame-by-frame scroll anima
 
 | Package | Description | Size | Version |
 |---------|-------------|------|---------|
-| [`@scroll-sequence/core`](./packages/core) | The core logic engine | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/core) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/core) |
-| [`@scroll-sequence/vanilla`](./packages/vanilla) | Wrapper for Vanilla JS | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/vanilla) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/vanilla) |
-| [`@scroll-sequence/react`](./packages/react) | Wrapper for React | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/react) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/react) |
-| [`@scroll-sequence/vue`](./packages/vue) | Wrapper for Vue | ![size](https://img.shields.io/bundlephobia/minzip/@scroll-sequence/vue) | ![npm](https://img.shields.io/npm/v/@scroll-sequence/vue) |
+| [`@apfel-sequence/core`](./packages/core) | The core logic engine | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/core) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/core) |
+| [`@apfel-sequence/vanilla`](./packages/vanilla) | Wrapper for Vanilla JS | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/vanilla) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/vanilla) |
+| [`@apfel-sequence/react`](./packages/react) | Wrapper for React | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/react) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/react) |
+| [`@apfel-sequence/vue`](./packages/vue) | Wrapper for Vue | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/vue) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/vue) |
 
 ## 🛠 Installation
 
@@ -29,19 +29,19 @@ Using your preferred package manager:
 
 ```bash
 # JS
-npm install @scroll-sequence/vanilla
+npm install @apfel-sequence/vanilla
 
 # React
-npm install @scroll-sequence/react
+npm install @apfel-sequence/react
 
 # Vue
-npm install @scroll-sequence/vue
+npm install @apfel-sequence/vue
 
 
 ```
 HTML
 ```html 
-<script src="https://unpkg.com/@scroll-sequence/vanilla@latest/dist/scroll-sequence.min.js"></script>
+<script src="https://unpkg.com/@apfel-sequence/vanilla@latest/dist/apfel-sequence.min.js"></script>
 ``` 
 
 ## Quick Start
@@ -49,18 +49,18 @@ HTML
 ### Vanilla JS
 
 ```html
-<script src="https://unpkg.com/@scroll-sequence/vanilla@latest/dist/scroll-sequence.min.js"></script>
+<script src="https://unpkg.com/@apfel-sequence/vanilla@latest/dist/apfel-sequence.min.js"></script>
 <!-- ... -->
 
 <!-- ...Setup your DOM -->
-<div id="sequence-container" class="scroll-sequence container">
-  <canvas id="sequence-canvas" class="scroll-sequence canvas"></canvas>
+<div id="sequence-container" class="apfel-sequence container">
+  <canvas id="sequence-canvas" class="apfel-sequence canvas"></canvas>
 </div>
 
 <!-- ... -->
 <!-- your JS -->
 <script>
-const sequence = new ScrollSequence({
+const sequence = new ApfelSequence({
   container: document.querySelector('#sequence-container'),
   canvas: document.querySelector('#sequence-canvas'),
   assetsConfig: [
@@ -87,7 +87,7 @@ const sequence = new ScrollSequence({
 ### React
 
 ```tsx
-import { ScrollSequence } from '@scroll-sequence/react';
+import { ApfelSequence } from '@apfel-sequence/react';
 
 
 const assets = [
@@ -104,7 +104,7 @@ const assets = [
 export default function Hero() {
   return (
     <div style={{ height: '300vh' }}>
-      <ScrollSequence
+      <ApfelSequence
         assetsConfig={assets}
         drawMode="cover"
         scrollConfig={{
@@ -122,7 +122,7 @@ export default function Hero() {
 
 ```vue
 <script setup>
-import { ScrollSequence } from '@scroll-sequence/vue';
+import { ApfelSequence } from '@apfel-sequence/vue';
 
 const assets = [{
   name: 'hero-sequence',
@@ -134,7 +134,7 @@ const assets = [{
 
 <template>
   <div style="height: 300vh">
-    <ScrollSequence 
+    <ApfelSequence 
       :assetsConfig="assets" 
       drawMode="cover"
     />

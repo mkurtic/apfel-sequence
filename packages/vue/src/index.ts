@@ -1,4 +1,4 @@
-import ScrollSequence from "./ScrollSequence.vue";
+import ApfelSequence from "./ApfelSequence.vue";
 
-export default ScrollSequence;
-export { ScrollSequence };
+export default ApfelSequence;
+export { ApfelSequence };

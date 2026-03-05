@@ -1,4 +1,4 @@
-import type { AssetsConfig, LoadingConfig, ScrollConfig } from "@scroll-sequence/core";
+import type { AssetsConfig, LoadingConfig, ScrollConfig } from "@apfel-sequence/core";
 
 export const heroAssets: AssetsConfig = [
 	{

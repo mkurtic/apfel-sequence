@@ -1,19 +1,19 @@
 {
-	"name": "@scroll-sequence/vue",
+	"name": "@apfel-sequence/vue",
 	"version": "1.1.2",
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mkurtic/scroll-sequence.git",
+		"url": "https://github.com/mkurtic/apfel-sequence.git",
 		"directory": "packages/vue"
 	},
 	"bugs": {
-		"url": "https://github.com/mkurtic/scroll-sequence/issues"
+		"url": "https://github.com/mkurtic/apfel-sequence/issues"
 	},
-	"homepage": "https://github.com/mkurtic/scroll-sequence/tree/main/packages/vue#readme",
+	"homepage": "https://github.com/mkurtic/apfel-sequence/tree/main/packages/vue#readme",
 	"keywords": [
-		"scroll-sequence",
+		"apfel-sequence",
 		"vue",
 		"component",
 		"composition-api",
@@ -25,21 +25,21 @@
 	},
 	"private": false,
 	"type": "module",
-	"main": "dist/scroll-sequence-vue.cjs",
-	"module": "dist/scroll-sequence-vue.es.js",
+	"main": "dist/apfel-sequence-vue.cjs",
+	"module": "dist/apfel-sequence-vue.es.js",
 	"types": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
 	"exports": {
 		".": {
-			"types": "./dist/scroll-sequence-vue.d.ts",
-			"import": "./dist/scroll-sequence-vue.es.js",
-			"require": "./dist/scroll-sequence-vue.cjs"
+			"types": "./dist/apfel-sequence-vue.d.ts",
+			"import": "./dist/apfel-sequence-vue.es.js",
+			"require": "./dist/apfel-sequence-vue.cjs"
 		}
 	},
 	"dependencies": {
-		"@scroll-sequence/core": "^1.1.2"
+		"@apfel-sequence/core": "^1.1.2"
 	},
 	"peerDependencies": {
 		"vue": "^3.3.0"

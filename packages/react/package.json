@@ -1,19 +1,19 @@
 {
-	"name": "@scroll-sequence/react",
+	"name": "@apfel-sequence/react",
 	"version": "1.1.2",
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mkurtic/scroll-sequence.git",
+		"url": "https://github.com/mkurtic/apfel-sequence.git",
 		"directory": "packages/react"
 	},
 	"bugs": {
-		"url": "https://github.com/mkurtic/scroll-sequence/issues"
+		"url": "https://github.com/mkurtic/apfel-sequence/issues"
 	},
-	"homepage": "https://github.com/mkurtic/scroll-sequence/tree/main/packages/react#readme",
+	"homepage": "https://github.com/mkurtic/apfel-sequence/tree/main/packages/react#readme",
 	"keywords": [
-		"scroll-sequence",
+		"apfel-sequence",
 		"react",
 		"component",
 		"hook",
@@ -25,20 +25,20 @@
 	},
 	"private": false,
 	"type": "module",
-	"main": "dist/scroll-sequence-react.cjs",
-	"module": "dist/scroll-sequence-react.es.js",
-	"types": "dist/scroll-sequence-react.d.ts",
+	"main": "dist/apfel-sequence-react.cjs",
+	"module": "dist/apfel-sequence-react.es.js",
+	"types": "dist/apfel-sequence-react.d.ts",
 	"files": [
 		"dist"
 	],
 	"exports": {
 		".": {
-			"import": "./dist/scroll-sequence-react.es.js",
-			"require": "./dist/scroll-sequence-react.cjs"
+			"import": "./dist/apfel-sequence-react.es.js",
+			"require": "./dist/apfel-sequence-react.cjs"
 		}
 	},
 	"dependencies": {
-		"@scroll-sequence/core": "^1.1.2"
+		"@apfel-sequence/core": "^1.1.2"
 	},
 	"peerDependencies": {
 		"react": "^18.3.1",

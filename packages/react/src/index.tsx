@@ -1,26 +1,26 @@
 import { useEffect, useRef } from "react";
-import { ScrollSequenceEngine } from "@scroll-sequence/core";
-import type { ScrollSequenceProps } from "@scroll-sequence/core";
+import { ApfelSequenceEngine } from "@apfel-sequence/core";
+import type { ApfelSequenceProps } from "@apfel-sequence/core";
 
-export type ScrollSequenceReactProps = Omit<ScrollSequenceProps, "canvas" | "container">;
+export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, "canvas" | "container">;
 
-const ScrollSequence = ({ assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt }: ScrollSequenceReactProps) => {
+const ApfelSequence = ({ assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt }: ApfelSequenceReactProps) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
 
 	useEffect(() => {
 		if (!canvasRef.current) {
-			console.warn(`ScrollSequenceReact: selector did not return an HTMLCanvasElement`);
+			console.warn(`ApfelSequenceReact: selector did not return an HTMLCanvasElement`);
 			return;
 		}
 
 		if (!containerRef.current) {
-			console.warn(`ScrollSequenceReact: selector did not return an HTMLElement`);
+			console.warn(`ApfelSequenceReact: selector did not return an HTMLElement`);
 			return;
 		}
 
-		const engine = new ScrollSequenceEngine({
+		const engine = new ApfelSequenceEngine({
 			assetsConfig: assetsConfig,
 			drawMode,
 			networkPolicy,
@@ -37,11 +37,11 @@ const ScrollSequence = ({ assetsConfig, drawMode, networkPolicy, scrollConfig, l
 	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig]);
 
 	return (
-		<div className="scroll-sequence container" ref={containerRef}>
-			<canvas className="scroll-sequence" ref={canvasRef} aria-label={alt} role="img"/>
+		<div className="apfel-sequence container" ref={containerRef}>
+			<canvas className="apfel-sequence" ref={canvasRef} aria-label={alt} role="img"/>
 			{/*Fallback only img tag*/}
 		</div>
 	);
 };
 
-export default ScrollSequence;
+export default ApfelSequence;
