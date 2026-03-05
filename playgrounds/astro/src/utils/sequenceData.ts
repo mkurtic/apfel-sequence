@@ -3,7 +3,7 @@ import type { AssetsConfig, LoadingConfig, ScrollConfig } from "@scroll-sequence
 export const heroAssets: AssetsConfig = [
 	{
 		name: "desktop",
-		url: "/images/sequences/1/desktop/A_",
+		url: "/images/sequences/1/desktop/lagger_1",
 		frameFirstId: 1,
 		frameLastId: 235,
 		frameSuffix: " Medium.jpeg",
@@ -12,7 +12,7 @@ export const heroAssets: AssetsConfig = [
 	},
 	{
 		name: "mobile",
-		url: "/images/sequences/1/mobile/A_",
+		url: "/images/sequences/1/mobile/lagger_1",
 		frameFirstId: 1,
 		frameLastId: 234,
 		frameSuffix: " Large.jpeg",
@@ -28,7 +28,7 @@ export const heroLoadingConfig: LoadingConfig = {
 export const section2Assets: AssetsConfig = [
 	{
 		name: "largeImages",
-		url: "/images/sequences/2/B_",
+		url: "/images/sequences/2/3Bottles-Reveall-Studio",
 		frameFirstId: 1,
 		frameLastId: 140,
 		frameSuffix: " Large.jpeg",
