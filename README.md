@@ -18,7 +18,7 @@ ApfelSequence allows you to create high-performance frame-by-frame scroll animat
 
 | Package | Description | Size | Version |
 |---------|-------------|------|---------|
-| [`@apfel-sequence/core`](./packages/core) | The core logic engine | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/core) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/core) |
+| [`@apfel-sequence/core`](./packages/core) | The core engine | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/core) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/core) |
 | [`@apfel-sequence/vanilla`](./packages/vanilla) | Wrapper for Vanilla JS | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/vanilla) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/vanilla) |
 | [`@apfel-sequence/react`](./packages/react) | Wrapper for React | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/react) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/react) |
 | [`@apfel-sequence/vue`](./packages/vue) | Wrapper for Vue | ![size](https://img.shields.io/bundlephobia/minzip/@apfel-sequence/vue) | ![npm](https://img.shields.io/npm/v/@apfel-sequence/vue) |
@@ -171,8 +171,9 @@ const assets = [
 | `assetsConfig` | `Array`       | `[]`                  | Array of asset configurations  |
 | `drawMode`      | `String`      | `'cover'`             | `'cover'` or `'contain'`           |
 | `scrollConfig`  | `Object`      | `{}`                  | Scroll trigger configuration   |
-| `networkPolicy` | `adaptive \| fallback-only` |`adaptive` | Not yet implemented
 
+Todo: 
+- [ ] Implement networkPolicy, to be able to switch between adaptive and fallback-only policies automatically
 
 ### Assets Configuration Object (`assetsConfig`)
 
@@ -204,8 +205,8 @@ You can control how frames are loaded (e.g., eager vs lazy, retry logic) using t
 | `preloadCount` | `number` | (calculated) | Number of frames to force-load initially to be always ahead of the current scroll position of the users. |
 
 ### Loading Strategy
-1.  **Sequential (Passive)**: Initial & progressive loading happens one-by-one to save bandwidth.
-2.  **Parallel (Active)**: Scrubbing/lazy-loading requests neighbors in parallel for speed.
+1.  **Sequential (lazy)**: Initial & progressive loading happens one-by-one to save bandwidth and to avoid network bottle-necks.
+2.  **Parallel (eager)**: Scrubbing/lazy-loading requests neighbors in parallel for speed, if your image sequences are too long or your images are too large, it may causes network bottle-necks.
 3.  **Resilience**: Auto-retries failed frames (3 attempts by default).
 
 ## License
