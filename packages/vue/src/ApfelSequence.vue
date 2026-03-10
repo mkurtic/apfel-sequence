@@ -1,7 +1,6 @@
 <template>
-	<div class="apfel-sequence container" ref="containerRef">
+	<div class="apfel-container" ref="containerRef">
 		<canvas class="apfel-sequence" ref="canvasRef" role="img" :aria-label="props.alt"></canvas>
-		<!-- Fallback only img tag -->
 	</div>
 </template>
 

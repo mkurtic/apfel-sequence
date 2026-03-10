@@ -87,15 +87,16 @@ export class ScrollScrub {
 		const rawProgress = (window.scrollY - (elementTop + startOffset)) / animationLength;
 		const progress = Math.min(1, Math.max(0, rawProgress));
 
-		// Directional callbacks — fire only at boundary crossings
-		if (progress > 0 && this.lastProgress <= 0) onEnter?.();
-		if (progress >= 1 && this.lastProgress < 1) onLeave?.();
-		if (progress < 1 && this.lastProgress >= 1) onEnterBack?.();
-		if (progress <= 0 && this.lastProgress > 0) onLeaveBack?.();
+		if (rawProgress >= 0 && this.lastProgress < 0) onEnter?.();
+		if (rawProgress >= 1 && this.lastProgress < 1) onLeave?.();
+		if (rawProgress < 1 && this.lastProgress >= 1) onEnterBack?.();
+		if (rawProgress < 0 && this.lastProgress >= 0) onLeaveBack?.();
 
 		if (progress !== this.lastProgress) {
 			this.lastProgress = progress;
-			onUpdate({ progress });
+			if (rawProgress >= 0 && rawProgress <= 1) {
+				onUpdate({ progress });
+			}
 		}
 	};
 

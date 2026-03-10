@@ -4,7 +4,8 @@ import type { ApfelSequenceProps } from "@apfel-sequence/core";
 
 export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, "canvas" | "container">;
 
-const ApfelSequence = ({ assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt }: ApfelSequenceReactProps) => {
+const ApfelSequence = (props: ApfelSequenceReactProps) => {
+	const { assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt } = props;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -37,7 +38,7 @@ const ApfelSequence = ({ assetsConfig, drawMode, networkPolicy, scrollConfig, lo
 	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig]);
 
 	return (
-		<div className="apfel-sequence container" ref={containerRef}>
+		<div className="apfel-container" ref={containerRef}>
 			<canvas className="apfel-sequence" ref={canvasRef} aria-label={alt} role="img"/>
 			{/*Fallback only img tag*/}
 		</div>

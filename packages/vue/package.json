@@ -1,6 +1,6 @@
 {
 	"name": "@apfel-sequence/vue",
-	"version": "1.1.2",
+	"version": "0.0.1",
 	"author": "Mehmed Kurtic",
 	"license": "MIT",
 	"repository": {
@@ -39,7 +39,7 @@
 		}
 	},
 	"dependencies": {
-		"@apfel-sequence/core": "^1.1.2"
+		"@apfel-sequence/core": "^0.0.1"
 	},
 	"peerDependencies": {
 		"vue": "^3.3.0"

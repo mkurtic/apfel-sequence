@@ -1,0 +1,1 @@
+playgrounds/astro/public/images/sequences/**/*.webp filter=lfs diff=lfs merge=lfs -text

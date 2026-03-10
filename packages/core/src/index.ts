@@ -1,6 +1,6 @@
 import { PrefersReducedMotion } from "./reduce-motion/reduce-motion";
-import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ApfelSequenceProps, Frame } from "./types/apfelSequence";
-export type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ApfelSequenceProps };
+import type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ApfelSequenceProps, Frame, DrawMode } from "./types/apfelSequence";
+export type { AssetsConfig, BreakpointConfig, LoadingConfig, ScrollConfig, ApfelSequenceProps, DrawMode };
 import { ScrollEngine } from "./scroll-engine/scroll-engine";
 import { ActiveBreakpoint } from "./active-breakpoint/active-breakpoint";
 import resolveFallbackFrameUrl from "./utils/url-resolvers/resolveFallbackUrls";

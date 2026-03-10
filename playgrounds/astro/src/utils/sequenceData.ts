@@ -1,23 +1,34 @@
-import type { AssetsConfig, LoadingConfig, ScrollConfig } from "@apfel-sequence/core";
+import type { AssetsConfig, LoadingConfig, ScrollConfig, DrawMode } from "@apfel-sequence/core";
+
+export const commonDrawMode: DrawMode = "cover";
 
 export const heroAssets: AssetsConfig = [
 	{
 		name: "desktop",
-		url: "/images/sequences/1/desktop/lagger_1",
+		url: "/images/sequences/mountains/desktop/mountains_",
 		frameFirstId: 1,
-		frameLastId: 235,
-		frameSuffix: " Medium.jpeg",
-		breakpointMin: 681,
+		frameLastId: 100,
+		frameSuffix: ".webp",
+		breakpointMin: 1025,
 		breakpointMax: 3000,
 	},
 	{
-		name: "mobile",
-		url: "/images/sequences/1/mobile/lagger_1",
+		name: "tablet",
+		url: "/images/sequences/mountains/tablet/mountains_",
 		frameFirstId: 1,
-		frameLastId: 234,
-		frameSuffix: " Large.jpeg",
+		frameLastId: 100,
+		frameSuffix: ".webp",
+		breakpointMin: 641,
+		breakpointMax: 1024,
+	},
+	{
+		name: "mobile",
+		url: "/images/sequences/mountains/mobile/mountains_",
+		frameFirstId: 1,
+		frameLastId: 100,
+		frameSuffix: ".webp",
 		breakpointMin: 0,
-		breakpointMax: 680,
+		breakpointMax: 640,
 	},
 ];
 
@@ -27,17 +38,36 @@ export const heroLoadingConfig: LoadingConfig = {
 
 export const section2Assets: AssetsConfig = [
 	{
-		name: "largeImages",
-		url: "/images/sequences/2/3Bottles-Reveall-Studio",
+		name: "desktop",
+		url: "/images/sequences/snow/desktop/snow_",
 		frameFirstId: 1,
-		frameLastId: 140,
-		frameSuffix: " Large.jpeg",
-		frameFallback: "/images/2/B_0001.jpeg",
+		frameLastId: 242,
+		frameSuffix: ".webp",
+		breakpointMin: 1025,
+		breakpointMax: 3000,
+	},
+	{
+		name: "tablet",
+		url: "/images/sequences/snow/tablet/snow_",
+		frameFirstId: 1,
+		frameLastId: 242,
+		frameSuffix: ".webp",
+		breakpointMin: 641,
+		breakpointMax: 1024,
+	},
+	{
+		name: "mobile",
+		url: "/images/sequences/snow/mobile/snow_",
+		frameFirstId: 1,
+		frameLastId: 242,
+		frameSuffix: ".webp",
+		breakpointMin: 0,
+		breakpointMax: 640,
 	},
 ];
 
 export const section2LoadingConfig: LoadingConfig = {
-	trigger: "#hero",
+	trigger: "#section-2",
 	start: "top top",
 	markers: false,
 };

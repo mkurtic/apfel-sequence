@@ -3,12 +3,12 @@ import Layout from "../../layouts/Layout.astro";
 ---
 <Layout>
   <section id="hero">
-		<div id="canvas-container">
+		<div id="canvas-container" class="apfel-container">
   		<canvas class="apfel-sequence" id="canvas"></canvas>
     </div>
   </section>
   <section id="section-2">
-		<div id="canvas-container-2">
+		<div id="canvas-container-2" class="apfel-container">
   		<canvas class="apfel-sequence" id="canvas-2"></canvas>
     </div>
   </section>
@@ -16,13 +16,14 @@ import Layout from "../../layouts/Layout.astro";
 </Layout>
 <script>
 import ApfelSequence from "@apfel-sequence/vanilla";
-import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
+import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig, commonDrawMode } from "./../../utils/sequenceData"
 
 const apfelSequenceHero = ApfelSequence({
   canvas: document.querySelector("#canvas"),
   container: document.querySelector("#canvas-container"),
   assetsConfig: heroAssets,
-  loadingConfig: heroLoadingConfig,
+	loadingConfig: heroLoadingConfig,
+	drawMode: commonDrawMode,
 });
 
 
@@ -32,5 +33,6 @@ const apfelSequenceSection2 = ApfelSequence({
   assetsConfig: section2Assets,
   loadingConfig: section2LoadingConfig,
   scrollConfig: section2ScrollConfig,
+	drawMode: commonDrawMode,
 });
 </script>

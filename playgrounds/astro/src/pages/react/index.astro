@@ -1,7 +1,7 @@
 ---
 import ApfelSequence from "@apfel-sequence/react";
 import Layout from "../../layouts/Layout.astro";
-import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig } from "./../../utils/sequenceData"
+import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig, commonDrawMode } from "./../../utils/sequenceData"
 ---
 <Layout>
 	<section id="hero">
@@ -10,6 +10,7 @@ import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, s
 			assetsConfig={heroAssets}
 			loadingConfig={heroLoadingConfig}
 			alt={"My hero alt text"} 
+			drawMode={commonDrawMode}
 		/>
 	</section>
 	<section id="section-2">
@@ -19,6 +20,7 @@ import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, s
 			loadingConfig={section2LoadingConfig}
 			scrollConfig={section2ScrollConfig}
 			alt={"Section alt text"} 
+			drawMode={commonDrawMode}
 		/>
 	</section>
 	<section></section>
