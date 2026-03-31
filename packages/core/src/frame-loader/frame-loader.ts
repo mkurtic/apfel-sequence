@@ -1,5 +1,5 @@
 import { getFrameHref } from "../utils/url-resolvers/getFrameHref";
-import type { BreakpointConfig, FrameLoaderProps, NetworkPolicy, Frame } from "../types/apfelSequence";
+import type { BreakpointConfig, FrameLoaderProps, NetworkPolicy, Frame, RenderableImage } from "../types/apfelSequence";
 import { Emitter } from "../utils/emitter/emitter";
 import { ScrollScrub } from "../scroll-engine/scroll-trigger";
 
@@ -11,6 +11,7 @@ class FrameLoader {
 	private preloadCount: number;
 	private networkPolicy: NetworkPolicy | undefined;
 	private activeRequests = new Map<number, Promise<void>>();
+	private abortControllers = new Map<number, AbortController>();
 	private lazyLoadingTL: ScrollScrub | null = null;
 	private maxRetries: number;
 	private retryDelay: number;
@@ -91,11 +92,14 @@ class FrameLoader {
 		const startTime = performance.now();
 		const src = getFrameHref(this.activeBreakpoint, frameNumber)!;
 
+		const controller = new AbortController();
+		this.abortControllers.set(index, controller);
+
 		let lastError: unknown;
 
 		for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
 			try {
-				const img = await this.loadInternal(src);
+				const img = await this.loadInternal(src, controller.signal);
 				const endTime = performance.now();
 				const stat: Frame = {
 					frameNumber,
@@ -110,9 +114,16 @@ class FrameLoader {
 				};
 				this.activeBreakpoint.frames[index] = stat;
 				this.emitter.emit("frameLoaded", stat);
+				this.abortControllers.delete(index);
 				return;
 			} catch (error) {
 				lastError = error;
+
+				if (error instanceof Error && error.name === "AbortError") {
+					this.abortControllers.delete(index);
+					return; // exit without emitting failure
+				}
+
 				if (attempt < this.maxRetries) {
 					const endTime = performance.now();
 					const stat: Frame = {
@@ -148,27 +159,76 @@ class FrameLoader {
 		this.emitter.emit("frameFailed", stat);
 
 		this.activeBreakpoint.frames[index] = stat;
+		this.abortControllers.delete(index);
 	}
 
-	private loadInternal(src: string): Promise<HTMLImageElement> {
+	private async loadInternal(src: string, signal?: AbortSignal): Promise<RenderableImage> {
+		try {
+			const response = await fetch(src, { signal, mode: "cors" });
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			const blob = await response.blob();
+			return await createImageBitmap(blob);
+		} catch (error) {
+			if (error instanceof Error && error.name === "AbortError") {
+				throw error; // Re-throw so caller handles intentional abort
+			}
+			// Fallback if createImageBitmap is unsupported or CORS fetch fails
+		}
+
 		return new Promise((resolve, reject) => {
 			const img = new Image();
-			img.src = src;
+			
+			const abortHandler = () => {
+				img.src = ""; // Cancels standard download in most browsers
+				const err = new Error("AbortError");
+				err.name = "AbortError";
+				onFail(err);
+			};
+
+			if (signal) {
+				signal.addEventListener("abort", abortHandler);
+				if (signal.aborted) {
+					abortHandler();
+					return;
+				}
+			}
+
+			const cleanUp = () => {
+				img.onload = null;
+				img.onerror = null;
+				if (signal) {
+					signal.removeEventListener("abort", abortHandler);
+				}
+			};
+
+			const onSuccess = () => {
+				cleanUp();
+				resolve(img);
+			};
+
+			const onFail = (err: unknown) => {
+				cleanUp();
+				reject(err);
+			};
 
 			if (typeof (img as HTMLImageElement).decode === "function") {
+				img.src = src;
 				img.decode()
-					.then(() => resolve(img))
+					.then(onSuccess)
 					.catch(() => {
 						if (img.complete) {
-							resolve(img);
+							onSuccess();
 							return;
 						}
-						img.onload = () => resolve(img);
-						img.onerror = (err: unknown) => reject(err);
+						img.onload = onSuccess;
+						img.onerror = onFail;
 					});
 			} else {
-				img.onload = () => resolve(img);
-				img.onerror = (e: unknown) => reject(e);
+				img.onload = onSuccess;
+				img.onerror = onFail;
+				img.src = src;
 			}
 		});
 	}
@@ -193,6 +253,16 @@ class FrameLoader {
 
 		const startFrame = Math.max(this.firstFrame, currentFrame - lookaheadFrames);
 		const endFrame = Math.min(this.lastFrame, currentFrame + lookaheadFrames);
+
+		// Sweep unneeded active fetches
+		for (const [activeIndex, controller] of this.abortControllers.entries()) {
+			const activeFrame = this.firstFrame + activeIndex;
+			if (activeFrame < startFrame || activeFrame > endFrame) {
+				controller.abort();
+				this.abortControllers.delete(activeIndex);
+				this.activeRequests.delete(activeIndex);
+			}
+		}
 
 		for (let frame = startFrame; frame <= endFrame; frame++) {
 			const index = frame - this.firstFrame;
@@ -243,6 +313,10 @@ class FrameLoader {
 			this.lazyLoadingTL.destroy();
 			this.lazyLoadingTL = null;
 		}
+		for (const controller of this.abortControllers.values()) {
+			controller.abort();
+		}
+		this.abortControllers.clear();
 		this.activeRequests.clear();
 	}
 }

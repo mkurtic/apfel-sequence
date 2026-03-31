@@ -1,6 +1,7 @@
 import { Emitter } from "../utils/emitter/emitter";
 export type DrawMode = "cover" | "contain";
 export type NetworkPolicy = "adaptive" | "fallback-only";
+export type RenderableImage = HTMLImageElement | ImageBitmap;
 
 export interface Frame {
 	frameNumber: number;
@@ -9,7 +10,7 @@ export interface Frame {
 	duration: number;
 	status: "success" | "error" | "pending";
 	url: string;
-	image: HTMLImageElement | null;
+	image: RenderableImage | null;
 	attempts: number;
 	index: number;
 }
@@ -164,7 +165,7 @@ export interface BreakpointConfig {
 	/** Optional fallback frame URL */
 	fallbackFrameUrl?: string | null;
 	/** Optional fallback frame */
-	fallbackFrame?: HTMLImageElement | null;
+	fallbackFrame?: RenderableImage | null;
 	/** First frame number for this breakpoint */
 	frameFirstId?: number;
 	/** Last frame number for this breakpoint */

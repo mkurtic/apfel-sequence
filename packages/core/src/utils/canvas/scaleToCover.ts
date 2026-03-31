@@ -1,4 +1,6 @@
-export const scaleToCover = (img: HTMLImageElement, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, dpr: number) => {
+import type { RenderableImage } from "../../types/apfelSequence";
+
+export const scaleToCover = (img: RenderableImage, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, dpr: number) => {
 	if (!img || !canvas || !ctx) return;
 
 	const cw = canvas.width;

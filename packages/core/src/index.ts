@@ -156,13 +156,17 @@ export class ApfelSequenceEngine {
 					breakpoint.frames.forEach((frame) => {
 					if (!frame || !frame.image) return;
 
-					if (frame.image.src.startsWith("blob:")) {
-						URL.revokeObjectURL(frame.image.src);
+					if (frame.image instanceof HTMLImageElement) {
+						if (frame.image.src.startsWith("blob:")) {
+							URL.revokeObjectURL(frame.image.src);
+						}
+						frame.image.src = "";
+						frame.image.onload = null;
+						frame.image.onerror = null;
+					} else if (typeof ImageBitmap !== "undefined" && frame.image instanceof ImageBitmap) {
+						frame.image.close(); // Immediate GPU memory clean up
 					}
 
-					frame.image.src = "";
-					frame.image.onload = null;
-					frame.image.onerror = null;
 					frame.image = null;
 				});
 				breakpoint.frames = [];

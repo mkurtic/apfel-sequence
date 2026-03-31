@@ -1,4 +1,4 @@
-import type { DrawMode } from "../types/apfelSequence";
+import type { DrawMode, RenderableImage } from "../types/apfelSequence";
 import { scaleToCover } from "../utils/canvas/scaleToCover";
 import { scaleToContain } from "../utils/canvas/scaleToContain";
 import type { Emitter } from "../utils/emitter/emitter";
@@ -8,7 +8,7 @@ class CanvasRender {
 	private drawMode: DrawMode | undefined;
 	private canvas: HTMLCanvasElement;
 	private container: HTMLElement;
-	private lastDrawnFrame: HTMLImageElement | null = null;
+	private lastDrawnFrame: RenderableImage | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
 	private emitter: Emitter;
 	constructor(config: {emitter: Emitter, canvas: HTMLCanvasElement; container: HTMLElement; dpr: number; drawMode: DrawMode | undefined }) {
@@ -18,12 +18,12 @@ class CanvasRender {
 		this.canvas = config.canvas;
 		this.container = config.container;
 
-		this.emitter.subscribe("drawFrame", (frame: HTMLImageElement | null, fallback: HTMLImageElement | null | undefined) => {
+		this.emitter.subscribe("drawFrame", (frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
 			this.drawFrame(frame, fallback);
 		});
 	}
 
-	private renderImage(image: HTMLImageElement, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+	private renderImage(image: RenderableImage, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
 		if (this.drawMode === "cover") {
 			scaleToCover(image, canvas, ctx, this.dpr);
 		} else {
@@ -31,7 +31,7 @@ class CanvasRender {
 		}
 	}
 
-	drawFrame = (frame: HTMLImageElement | null, fallback: HTMLImageElement | null | undefined) => {
+	drawFrame = (frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
 		const canvas = this.canvas;
 		const ctx = canvas?.getContext("2d");
 		const container = this.container;
