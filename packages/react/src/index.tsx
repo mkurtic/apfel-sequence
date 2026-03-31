@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useRef } from "react";
 import { ApfelSequenceEngine } from "@apfel-sequence/core";
 import type { ApfelSequenceProps } from "@apfel-sequence/core";

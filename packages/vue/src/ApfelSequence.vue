@@ -9,7 +9,9 @@ import { ref, watch, onMounted, onUnmounted } from "vue";
 import { ApfelSequenceEngine } from "@apfel-sequence/core";
 import type { ApfelSequenceProps } from "@apfel-sequence/core";
 
-const props = defineProps<ApfelSequenceProps>();
+export type ApfelSequenceVueProps = Omit<ApfelSequenceProps, "canvas" | "container">;
+
+const props = defineProps<ApfelSequenceVueProps>();
 let apfelSequence: ApfelSequenceEngine;
 
 const containerRef = ref<HTMLElement | null>(null);
