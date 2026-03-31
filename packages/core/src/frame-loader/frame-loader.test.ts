@@ -31,7 +31,7 @@ describe("FrameLoader", () => {
 		};
 
 		// Mock <img /> constructor default behavior (success)
-		global.Image = class {
+		globalThis.Image = class {
 			src = "";
 			onload: (() => void) | null = null;
 			onerror: ((err: unknown) => void) | null = null;
@@ -338,7 +338,7 @@ describe("FrameLoader", () => {
 			let attempts = 0;
 
 			// Override Image to fail
-			global.Image = class {
+			globalThis.Image = class {
 				src = "";
 				onload: any = null;
 				onerror: any = null;
@@ -388,7 +388,7 @@ describe("FrameLoader", () => {
 			let attempts = 0;
 
 			// Fail first time, succeed second
-			global.Image = class {
+			globalThis.Image = class {
 				src = "";
 				onload: any = null;
 				onerror: any = null;
