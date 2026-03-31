@@ -41,6 +41,10 @@ export class ApfelSequenceEngine {
 		this.emitter.subscribe("motionPreferenceChanged", (isReduced: boolean) => {
 			this.initFramesLoadings();
 		});
+
+		this.emitter.subscribe("breakpointChanged", this.handleBreakpointChanged);
+		this.emitter.subscribe("frameLoaded", this.handleFrameLoaded);
+
 		this.clearCacheOnBreakpointChange = config.clearCacheOnBreakpointChange ?? false;
 
 		this.dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
@@ -134,12 +138,6 @@ export class ApfelSequenceEngine {
 			this.resize();
 		});
 		this.resizeObserver.observe(this.config.container);
-
-		if(this.emitter){
-			this.emitter.subscribe("frameLoaded", (frame: Frame) => {
-				this.loadingConfig?.onFrameLoaded?.(frame);
-			});
-		}
 	};
 
 	initBreakpointsManager = () => {
@@ -148,18 +146,6 @@ export class ApfelSequenceEngine {
 		}
 		this.breakpoints = this.normalizeBreakpoints(this.config.assetsConfig);
 		this.activeBreakpointManager = new ActiveBreakpoint(this.breakpoints, this.emitter);
-		
-		this.emitter.subscribe("breakpointChanged",async (breakpoint: BreakpointConfig) => {
-			this.activeBreakpoint = breakpoint;
-
-			this.normalizeFramesRange(this.activeBreakpoint);
-			this.initFramesLoadingManager();
-			await this.initFramesLoadings();
-			
-			if(this.clearCacheOnBreakpointChange){
-				this.clearUnactiveBreakpoints();
-			}
-		});
 		this.activeBreakpointManager.init();
 	};
 
@@ -247,6 +233,8 @@ export class ApfelSequenceEngine {
 
 	initFramesLoadingManager = () => {
 		if (!this.activeBreakpoint) return;
+
+		this.frameLoaderManager?.destroy();
 		this.frameLoaderManager = new FrameLoader({
 			emitter: this.emitter,
 			activeBreakpoint: this.activeBreakpoint,
@@ -257,6 +245,39 @@ export class ApfelSequenceEngine {
 			maxRetries: this.loadingConfig?.maxRetries ?? 3,
 			retryDelay: this.loadingConfig?.retryDelay ?? 200,
 		});
+	};
+
+	private handleBreakpointChanged = async (breakpoint: BreakpointConfig) => {
+		this.activeBreakpoint = breakpoint;
+
+		this.normalizeFramesRange(this.activeBreakpoint);
+		this.initFramesLoadingManager();
+		await this.initFramesLoadings();
+		
+		if(this.clearCacheOnBreakpointChange){
+			this.clearUnactiveBreakpoints();
+		}
+	};
+
+	private handleFrameLoaded = (frame: Frame) => {
+		this.loadingConfig?.onFrameLoaded?.(frame);
+	};
+
+	public updateConfig = (newConfig: Partial<ApfelSequenceProps>) => {
+		this.config = { ...this.config, ...newConfig };
+		this.clearCacheOnBreakpointChange = this.config.clearCacheOnBreakpointChange ?? false;
+
+		this.tlPreloadFirstChunk?.destroy();
+		this.scrollEngine?.destroy();
+		this.frameLoaderManager?.destroy();
+		this.activeBreakpointManager?.destroy();
+
+		if (this.resizeObserver) {
+			this.resizeObserver.disconnect();
+			this.resizeObserver = null;
+		}
+
+		this.init(this.config);
 	};
 
 	handleFrameChange = (frameId: number) => {

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import { ApfelSequenceEngine } from "@apfel-sequence/core";
 import type { ApfelSequenceProps } from "@apfel-sequence/core";
 
@@ -32,6 +32,12 @@ onMounted(() => {
 		container: containerRef.value,
 	});
 });
+
+watch(props, (newProps) => {
+	if (apfelSequence) {
+		apfelSequence.updateConfig(newProps);
+	}
+}, { deep: true });
 
 onUnmounted(() => {
 	apfelSequence?.destroy();

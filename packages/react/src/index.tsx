@@ -8,7 +8,7 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 	const { assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt } = props;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
+	const engineRef = useRef<ApfelSequenceEngine | null>(null);
 
 	useEffect(() => {
 		if (!canvasRef.current) {
@@ -21,8 +21,8 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 			return;
 		}
 
-		const engine = new ApfelSequenceEngine({
-			assetsConfig: assetsConfig,
+		engineRef.current = new ApfelSequenceEngine({
+			assetsConfig,
 			drawMode,
 			networkPolicy,
 			scrollConfig,
@@ -33,9 +33,23 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 		});
 
 		return () => {
-			engine.destroy();
+			engineRef.current?.destroy();
+			engineRef.current = null;
 		};
-	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig]);
+	}, []);
+
+	useEffect(() => {
+		if (engineRef.current) {
+			engineRef.current.updateConfig({
+				assetsConfig,
+				drawMode,
+				networkPolicy,
+				scrollConfig,
+				loadingConfig,
+				alt,
+			});
+		}
+	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt]);
 
 	return (
 		<div className="apfel-container" ref={containerRef}>
