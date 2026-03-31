@@ -4,14 +4,13 @@ import { Emitter } from "../utils/emitter/emitter";
 import { ScrollScrub } from "../scroll-engine/scroll-trigger";
 
 class FrameLoader {
-	private firstFrameLoaded: boolean = false;
 	private emitter: Emitter;
 	private activeBreakpoint: BreakpointConfig;
 	private firstFrame: number;
 	private lastFrame: number;
 	private preloadCount: number;
 	private networkPolicy: NetworkPolicy | undefined;
-	private loadingFrames: Set<number> = new Set();
+	private activeRequests = new Map<number, Promise<void>>();
 	private lazyLoadingTL: ScrollScrub | null = null;
 	private maxRetries: number;
 	private retryDelay: number;
@@ -61,16 +60,34 @@ class FrameLoader {
 		this.processQueue();
 	}
 
-	private async processFrameLoad(frameNumber: number): Promise<void> {
-		if (!this.activeBreakpoint) return;
+	private processFrameLoad(frameNumber: number): Promise<void> {
+		if (!this.activeBreakpoint) return Promise.resolve();
 
 		const index = frameNumber - this.firstFrame;
 
-		if (this.activeBreakpoint.frames[index] || this.loadingFrames.has(index)) {
-			return;
+		// Frame is fully cached in memory
+		if (this.activeBreakpoint.frames[index]) {
+			return Promise.resolve();
 		}
 
-		this.loadingFrames.add(index);
+		// If a fetch is already on-going for this frame, return its existing Promise
+		if (this.activeRequests.has(index)) {
+			return this.activeRequests.get(index)!;
+		}
+
+		// Initiate the network fetch and queue the Promise
+		const requestPromise = this.executeNetworkFetch(frameNumber, index);
+		this.activeRequests.set(index, requestPromise);
+
+		// Clean up the queue mapping once resolved
+		requestPromise.finally(() => {
+			this.activeRequests.delete(index);
+		});
+
+		return requestPromise;
+	}
+
+	private async executeNetworkFetch(frameNumber: number, index: number): Promise<void> {
 		const startTime = performance.now();
 		const src = getFrameHref(this.activeBreakpoint, frameNumber)!;
 
@@ -92,7 +109,6 @@ class FrameLoader {
 					index: index,
 				};
 				this.activeBreakpoint.frames[index] = stat;
-				this.loadingFrames.delete(index);
 				this.emitter.emit("frameLoaded", stat);
 				return;
 			} catch (error) {
@@ -132,7 +148,6 @@ class FrameLoader {
 		this.emitter.emit("frameFailed", stat);
 
 		this.activeBreakpoint.frames[index] = stat;
-		this.loadingFrames.delete(index);
 	}
 
 	private loadInternal(src: string): Promise<HTMLImageElement> {
@@ -228,7 +243,7 @@ class FrameLoader {
 			this.lazyLoadingTL.destroy();
 			this.lazyLoadingTL = null;
 		}
-		this.loadingFrames.clear();
+		this.activeRequests.clear();
 	}
 }
 
