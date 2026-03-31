@@ -1,9 +1,8 @@
 import { vi } from "vitest";
 
-// Mock browser APIs required by GSAP/ScrollTrigger
 Object.defineProperty(window, "matchMedia", {
 	writable: true,
-	value: vi.fn().mockImplementation((query) => ({
+	value: vi.fn().mockImplementation((query: string) => ({
 		matches: false,
 		media: query,
 		onchange: null,
@@ -52,7 +51,7 @@ Object.defineProperty(window, "pageXOffset", {
 });
 
 // Mock requestAnimationFrame
-globalThis.requestAnimationFrame = vi.fn((cb) => {
+globalThis.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
 	setTimeout(cb, 16);
 	return 0;
 });
