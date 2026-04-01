@@ -70,6 +70,9 @@ export interface LoadingConfig {
 
 	/** Delay in ms between retries (default: 200) */
 	retryDelay?: number;
+
+	/** Maximum concurrent network connections for image loading (default: 5) */
+	maxConcurrency?: number;
 }
 
 /**
@@ -190,6 +193,7 @@ export interface FrameLoaderProps {
 	onFrameLoaded?: (stat: Frame) => void;
 	maxRetries: number;
 	retryDelay: number;
+	maxConcurrency?: number;
 }
 
 export interface ScrollEngineProps {

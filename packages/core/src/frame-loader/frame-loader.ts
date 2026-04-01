@@ -15,8 +15,15 @@ class FrameLoader {
 	private lazyLoadingTL: ScrollScrub | null = null;
 	private maxRetries: number;
 	private retryDelay: number;
-	private queue: { frameNumber: number; resolve: () => void; reject: (err: unknown) => void }[] = [];
-	private isProcessing: boolean = false;
+	private maxConcurrency: number;
+	private activeDownloads: number = 0;
+	private queue: { 
+		frameNumber: number; 
+		priority: "high" | "low"; 
+		resolve: () => void; 
+		reject: (err: unknown) => void;
+	}[] = [];
+
 	constructor(config: FrameLoaderProps) {
 		this.emitter = config.emitter;
 		this.activeBreakpoint = config.activeBreakpoint;
@@ -26,39 +33,73 @@ class FrameLoader {
 		this.networkPolicy = config.networkPolicy;
 		this.maxRetries = config.maxRetries;
 		this.retryDelay = config.retryDelay;
+		this.maxConcurrency = config.maxConcurrency || 5;
 	}
-
 
 	async loadFrame(
 		frameNumber: number,
 		priority: "sequential" | "parallel" = "sequential"
 	): Promise<void> {
-		if (priority === "parallel") {
-			return this.processFrameLoad(frameNumber);
+		if (!this.activeBreakpoint) return Promise.resolve();
+
+		const index = frameNumber - this.firstFrame;
+
+		// Frame is fully cached in memory
+		if (this.activeBreakpoint.frames[index]) {
+			return Promise.resolve();
 		}
+
+		// If a fetch is already on-going for this frame, return its existing Promise
+		if (this.activeRequests.has(index)) {
+			return this.activeRequests.get(index)!;
+		}
+
 		return new Promise((resolve, reject) => {
-			this.queue.push({ frameNumber, resolve, reject });
+			const internalPriority: "high" | "low" = priority === "parallel" ? "high" : "low";
+			
+			const existingItem = this.queue.find(q => q.frameNumber === frameNumber);
+			if (existingItem) {
+				// If already in queue, just wrap its resolution
+				const origResolve = existingItem.resolve;
+				const origReject = existingItem.reject;
+				existingItem.resolve = () => { origResolve(); resolve(); };
+				existingItem.reject = (err) => { origReject(err); reject(err); };
+				
+				// Upgrade priority if needed
+				if (internalPriority === "high" && existingItem.priority === "low") {
+					existingItem.priority = "high";
+					this.queue = this.queue.filter(q => q !== existingItem);
+					this.queue.unshift(existingItem);
+				}
+				return;
+			}
+
+			const task = { frameNumber, priority: internalPriority, resolve, reject };
+			if (internalPriority === "high") {
+				this.queue.unshift(task); // Preempt
+			} else {
+				this.queue.push(task); // Back of queue
+			}
+			
 			this.processQueue();
 		});
 	}
 
 	private async processQueue() {
-		if (this.isProcessing || this.queue.length === 0) return;
+		while (this.activeDownloads < this.maxConcurrency && this.queue.length > 0) {
+			const item = this.queue.shift();
+			if (!item) continue;
 
-		this.isProcessing = true;
-		const item = this.queue.shift();
-
-		if (item) {
-			try {
-				await this.processFrameLoad(item.frameNumber);
-				item.resolve();
-			} catch (err) {
-				item.reject(err);
-			}
+			this.activeDownloads++;
+			
+			this.processFrameLoad(item.frameNumber)
+				.then(() => item.resolve())
+				.catch((err) => item.reject(err))
+				.finally(() => {
+					this.activeDownloads--;
+					this.processQueue();
+				});
 		}
-
-		this.isProcessing = false;
-		this.processQueue();
 	}
 
 	private processFrameLoad(frameNumber: number): Promise<void> {
@@ -264,6 +305,17 @@ class FrameLoader {
 			}
 		}
 
+		// Sweep unneeded pending tasks in the queue
+		this.queue = this.queue.filter(task => {
+			if (task.priority === "high" && (task.frameNumber < startFrame || task.frameNumber > endFrame)) {
+				const err = new Error("AbortError");
+				err.name = "AbortError";
+				task.reject(err);
+				return false; // remove from queue
+			}
+			return true; // keep low priority (sequential background tasks) and valid high priority tasks
+		});
+
 		for (let frame = startFrame; frame <= endFrame; frame++) {
 			const index = frame - this.firstFrame;
 			if (!this.activeBreakpoint.frames[index]) {
@@ -318,6 +370,13 @@ class FrameLoader {
 		}
 		this.abortControllers.clear();
 		this.activeRequests.clear();
+		
+		for (const task of this.queue) {
+			const err = new Error("AbortError");
+			err.name = "AbortError";
+			task.reject(err);
+		}
+		this.queue = [];
 	}
 }
 

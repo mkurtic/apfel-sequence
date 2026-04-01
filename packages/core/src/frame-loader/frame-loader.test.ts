@@ -343,7 +343,6 @@ describe("FrameLoader", () => {
 				onload: any = null;
 				onerror: any = null;
 				complete = false;
-				decode = vi.fn();
 				constructor() {
 					attempts++;
 					setTimeout(() => {
@@ -492,6 +491,152 @@ describe("FrameLoader", () => {
 			expect(spy).toHaveBeenCalledWith(1);
 			expect(spy).toHaveBeenCalledWith(2);
 			expect(spy).toHaveBeenCalledWith(3);
+		});
+	});
+	describe("Mathematical Concurrency & Priority", () => {
+		it("should never exceed maxConcurrency (5) when loading large batches in parallel", async () => {
+			let activeFetches = 0;
+			let maxActiveFetches = 0;
+			
+			// Mock Image to take exactly 10ms and track concurrency
+			globalThis.Image = class {
+				src = "";
+				onload: any = null;
+				onerror: any = null;
+				complete = false;
+				constructor() {
+					activeFetches++;
+					if (activeFetches > maxActiveFetches) {
+						maxActiveFetches = activeFetches;
+					}
+					// Take exactly 10ms to complete
+					setTimeout(() => {
+						activeFetches--;
+						this.complete = true;
+						if (this.onload) this.onload();
+					}, 10);
+				}
+			} as any;
+
+			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 50,
+				preloadCount: 0,
+				maxRetries: 3,
+				retryDelay: 10,
+				maxConcurrency: 5, // Enforce 5
+			});
+
+			const startTime = Date.now();
+			
+			const promises = [];
+			for (let i = 1; i <= 20; i++) {
+				promises.push(frameLoader.loadFrame(i, "parallel"));
+			}
+			
+			await vi.advanceTimersByTimeAsync(100);
+			await Promise.all(promises);
+
+			// Check mathematical bounds
+			expect(maxActiveFetches).toBeLessThanOrEqual(5);
+			expect(maxActiveFetches).toBeGreaterThan(0); // prove it actually downloaded
+		});
+
+		it("should preempt low priority queue items with high priority items", async () => {
+			const loadOrder: number[] = [];
+			
+			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 100,
+				preloadCount: 0,
+				maxRetries: 3,
+				retryDelay: 10,
+				maxConcurrency: 1, // Force 1-by-1 to strictly observe order
+			});
+
+			// We need a way to spy on which frame is loading when
+			const spy = vi.spyOn(frameLoader as any, "executeNetworkFetch").mockImplementation(async (frameNum: any) => {
+				loadOrder.push(frameNum);
+				await new Promise(r => setTimeout(r, 10)); // simulate 10ms fetch
+			});
+
+			// Push 5 sequential (low priority) frames
+			const promises = [];
+			for (let i = 1; i <= 5; i++) {
+				promises.push(frameLoader.loadFrame(i, "sequential"));
+			}
+			// Push 1 parallel (high priority) frame
+			promises.push(frameLoader.loadFrame(99, "parallel"));
+
+			await vi.advanceTimersByTimeAsync(200);
+			await Promise.all(promises);
+			
+			// Order should be: 1 (starts immediately, queue empty), 99 (preempts 2, 3, 4, 5), then 2, 3, 4, 5.
+			expect(loadOrder).toEqual([1, 99, 2, 3, 4, 5]);
+		});
+	});
+
+	describe("Garbage Collection & Pre-flight Queue Trimming", () => {
+		it("should reject and clear out-of-bounds frames from the queue without fetching them", async () => {
+			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
+				activeBreakpoint: { ...mockBreakpoint, frameLastId: 200, frames: new Array(200).fill(null) },
+				firstFrame: 1,
+				lastFrame: 200,
+				preloadCount: 0,
+				maxRetries: 3,
+				retryDelay: 10,
+				maxConcurrency: 1, // force queuing
+			});
+
+			// Queue 10 frames sequentially (1-10) using loadFrame behind the scenes
+			const p1 = frameLoader.loadFrame(1, "parallel").catch(() => {});
+			const p2 = frameLoader.loadFrame(2, "parallel").catch(() => {});
+			const p99 = frameLoader.loadFrame(99, "parallel"); // this will wait in queue
+			
+			let rejects = 0;
+			p99.catch(e => {
+				if(e.name === "AbortError") rejects++;
+			});
+
+			// Immediately force a massive scroll to frame 190 which will trigger lazyLoadAroundFrame(190),
+			// causing frames 1, 2, 99 (start is 190 - 67 = 123) to be out of bounds.
+			frameLoader.lazyLoadAroundFrame(190);
+
+			await vi.advanceTimersByTimeAsync(1); // Flush microtasks so reject handlers can fire
+
+			expect(rejects).toBe(1); // p99 was instantly rejected via Queue trim
+			expect((frameLoader as any).queue.length).toBeGreaterThan(0); // the new 190 neighborhood is queued
+		});
+
+		it("should cleanly drop internal Map references (abortControllers, activeRequests) on destroy", async () => {
+			frameLoader = new FrameLoader({
+				emitter: new Emitter(),
+				activeBreakpoint: mockBreakpoint,
+				firstFrame: 1,
+				lastFrame: 10,
+				preloadCount: 0,
+				maxRetries: 1,
+				retryDelay: 0,
+			});
+
+			const p = frameLoader.loadFrame(1, "parallel");
+
+			expect((frameLoader as any).activeRequests.size).toBe(1);
+			expect((frameLoader as any).abortControllers.size).toBe(1);
+			expect((frameLoader as any).activeDownloads).toBe(1);
+
+			frameLoader.destroy();
+
+			expect((frameLoader as any).activeRequests.size).toBe(0);
+			expect((frameLoader as any).abortControllers.size).toBe(0);
+			expect((frameLoader as any).queue.length).toBe(0);
+
+			await p.catch(() => {}); // Catch the abort error
 		});
 	});
 });
