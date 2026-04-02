@@ -18,8 +18,7 @@ export default defineConfig({
 							"@apfel-sequence/vue": path.resolve("../../packages/vue/src/index.ts"),
 					  }
 					: {
-							// In Production: Alias to built dist files (simulating NPM package usage)
-							"@apfel-sequence/core": path.resolve("../../packages/core/dist/index.esm.js"),
+							"@apfel-sequence/core": path.resolve("../../packages/core/dist/index.mjs"),
 							"apfel-sequence": path.resolve("../../packages/vanilla/dist/apfel-sequence.es.js"),
 							"@apfel-sequence/react": path.resolve("../../packages/react/dist/apfel-sequence-react.es.js"),
 							"@apfel-sequence/vue": path.resolve("../../packages/vue/dist/apfel-sequence-vue.es.js"),
