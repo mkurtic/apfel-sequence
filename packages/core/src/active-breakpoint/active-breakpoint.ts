@@ -32,9 +32,9 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 		}
 	}
 
-	private debounce(func: Function, wait: number) {
-		let timeout: any;
-		return (...args: any[]) => {
+	private debounce<F extends (...args: any[]) => any>(func: F, wait: number) {
+		let timeout: ReturnType<typeof setTimeout>;
+		return (...args: Parameters<F>) => {
 			clearTimeout(timeout);
 			timeout = setTimeout(() => func.apply(this, args), wait);
 		};
