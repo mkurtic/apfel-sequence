@@ -5,7 +5,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "astro dev",
-		"build": "git lfs pull && npm --prefix ../../ run build:all && astro build",
+		"build": "git config remote.origin.url https://github.com/mkurtic/apfel-sequence.git && git lfs pull && npm --prefix ../../ run build:all && astro build",
 		"preview": "astro preview",
 		"astro": "astro"
 	},
