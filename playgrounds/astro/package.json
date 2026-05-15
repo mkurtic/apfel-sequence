@@ -5,7 +5,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "astro dev",
-		"build": "npm --prefix ../../ run build:all && astro build",
+		"build": "git lfs pull && npm --prefix ../../ run build:all && astro build",
 		"preview": "astro preview",
 		"astro": "astro"
 	},
