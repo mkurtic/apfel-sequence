@@ -319,7 +319,9 @@ class FrameLoader {
 		for (let frame = startFrame; frame <= endFrame; frame++) {
 			const index = frame - this.firstFrame;
 			if (!this.activeBreakpoint.frames[index]) {
-				this.loadFrame(frame, "parallel");
+				this.loadFrame(frame, "parallel").catch((err) => {
+					if (err instanceof Error && err.name !== "AbortError") console.error(err);
+				});
 			}
 		}
 	}
