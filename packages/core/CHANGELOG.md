@@ -1,5 +1,11 @@
 # @apfel-sequence/core
 
+## 0.1.0
+
+### Minor Changes
+
+- Initial beta release 0.1.0
+
 ## 1.1.2
 
 ### Patch Changes

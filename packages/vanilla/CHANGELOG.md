@@ -1,5 +1,16 @@
 # @apfel-sequence/vanilla
 
+## 0.1.0
+
+### Minor Changes
+
+- Initial beta release 0.1.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @apfel-sequence/core@0.1.0
+
 ## 1.1.2
 
 ### Patch Changes
