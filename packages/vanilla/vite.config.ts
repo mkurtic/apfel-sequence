@@ -9,6 +9,10 @@ export default defineConfig({
 			entryRoot: path.resolve(__dirname, "src"),
 			outDir: path.resolve(__dirname, "dist"),
 			insertTypesEntry: true,
+			beforeWriteFile: (filePath, content) => ({
+				filePath,
+				content: content.replace(/\.\.\/\.\.\/core\/src/g, "@apfel-sequence/core"),
+			}),
 		}),
 	],
 	build: {
@@ -19,7 +23,6 @@ export default defineConfig({
 			fileName: (format) => (format === "es" ? "apfel-sequence.es.js" : "apfel-sequence.cjs"),
 		},
 		rollupOptions: {
-			external: ["@apfel-sequence/core"],
 		},
 	},
 });
