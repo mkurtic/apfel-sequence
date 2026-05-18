@@ -1,38 +1,37 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { FrameLoader } from "./frame-loader";
-import type { BreakpointConfig } from "../types/apfelSequence";
-import { Emitter } from "../utils/emitter/emitter";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { FrameLoader } from './frame-loader';
+import type { BreakpointConfig } from '../types/apfelSequence';
+import { Emitter } from '../utils/emitter/emitter';
 
 const mockScrollScrubInstances: any[] = [];
-vi.mock("../scroll-engine/scroll-trigger", () => ({
+vi.mock('../scroll-engine/scroll-trigger', () => ({
 	ScrollScrub: vi.fn().mockImplementation(function (this: any, props: any) {
 		this.init = vi.fn();
 		this.destroy = vi.fn();
 		this._props = props;
 		mockScrollScrubInstances.push(this);
-	}),
+	})
 }));
 
-
-describe("FrameLoader", () => {
+describe('FrameLoader', () => {
 	let mockBreakpoint: BreakpointConfig;
 	let frameLoader: FrameLoader;
 
 	beforeEach(() => {
 		mockBreakpoint = {
-			name: "test-breakpoint",
-			url: "/test",
+			name: 'test-breakpoint',
+			url: '/test',
 			frames: new Array(10).fill(null),
 			frameDigits: 4,
 			frameFirstId: 1,
 			frameLastId: 10,
-			frameSuffix: ".jpg",
-			framePrefix: "frame_",
+			frameSuffix: '.jpg',
+			framePrefix: 'frame_'
 		};
 
 		// Mock <img /> constructor default behavior (success)
 		globalThis.Image = class {
-			src = "";
+			src = '';
 			onload: (() => void) | null = null;
 			onerror: ((err: unknown) => void) | null = null;
 			complete = false;
@@ -54,7 +53,7 @@ describe("FrameLoader", () => {
 		vi.clearAllMocks();
 	});
 
-	describe("Sequential Loading Mode", () => {
+	describe('Sequential Loading Mode', () => {
 		beforeEach(() => {
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
@@ -63,14 +62,14 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 		});
 
-		it("should load frames sequentially one at a time", async () => {
-			const loadPromise1 = frameLoader.loadFrame(1, "sequential");
-			const loadPromise2 = frameLoader.loadFrame(2, "sequential");
-			const loadPromise3 = frameLoader.loadFrame(3, "sequential");
+		it('should load frames sequentially one at a time', async () => {
+			const loadPromise1 = frameLoader.loadFrame(1, 'sequential');
+			const loadPromise2 = frameLoader.loadFrame(2, 'sequential');
+			const loadPromise3 = frameLoader.loadFrame(3, 'sequential');
 
 			// First frame should start loading immediately
 			expect(mockBreakpoint.frames[0]).toBeNull();
@@ -81,24 +80,24 @@ describe("FrameLoader", () => {
 
 			// First frame should be loaded
 			expect(mockBreakpoint.frames[0]).not.toBeNull();
-			expect(mockBreakpoint.frames[0]?.status).toBe("success");
+			expect(mockBreakpoint.frames[0]?.status).toBe('success');
 
 			// Second frame should now start
 			await vi.advanceTimersByTimeAsync(15);
 			await loadPromise2;
 
 			expect(mockBreakpoint.frames[1]).not.toBeNull();
-			expect(mockBreakpoint.frames[1]?.status).toBe("success");
+			expect(mockBreakpoint.frames[1]?.status).toBe('success');
 
 			// Third frame
 			await vi.advanceTimersByTimeAsync(15);
 			await loadPromise3;
 
 			expect(mockBreakpoint.frames[2]).not.toBeNull();
-			expect(mockBreakpoint.frames[2]?.status).toBe("success");
+			expect(mockBreakpoint.frames[2]?.status).toBe('success');
 		});
 
-		it("should queue frames and process them in order", async () => {
+		it('should queue frames and process them in order', async () => {
 			const loadOrder: number[] = [];
 			const onFrameLoaded = vi.fn((frame) => {
 				loadOrder.push(frame.frameNumber);
@@ -111,15 +110,15 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// multiple frames => queued
 			const promises = [
-				frameLoader.loadFrame(5, "sequential"),
-				frameLoader.loadFrame(3, "sequential"),
-				frameLoader.loadFrame(8, "sequential"),
+				frameLoader.loadFrame(5, 'sequential'),
+				frameLoader.loadFrame(3, 'sequential'),
+				frameLoader.loadFrame(8, 'sequential')
 			];
 
 			await vi.advanceTimersByTimeAsync(100);
@@ -129,7 +128,7 @@ describe("FrameLoader", () => {
 			expect(loadOrder).toEqual([5, 3, 8]);
 		});
 
-		it("should not load the same frame twice in sequential mode", async () => {
+		it('should not load the same frame twice in sequential mode', async () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
@@ -139,16 +138,16 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// same frame twice
-			const promise1 = frameLoader.loadFrame(1, "sequential");
+			const promise1 = frameLoader.loadFrame(1, 'sequential');
 			await vi.advanceTimersByTimeAsync(15);
 			await promise1;
 
-			const promise2 = frameLoader.loadFrame(1, "sequential");
+			const promise2 = frameLoader.loadFrame(1, 'sequential');
 			await vi.advanceTimersByTimeAsync(15);
 			await promise2;
 
@@ -157,7 +156,7 @@ describe("FrameLoader", () => {
 		});
 	});
 
-	describe("Parallel Loading Mode", () => {
+	describe('Parallel Loading Mode', () => {
 		beforeEach(() => {
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
@@ -166,33 +165,33 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 		});
 
-		it("should load frames in parallel simultaneously", async () => {
+		it('should load frames in parallel simultaneously', async () => {
 			const loadPromises = [
-				frameLoader.loadFrame(1, "parallel"),
-				frameLoader.loadFrame(2, "parallel"),
-				frameLoader.loadFrame(3, "parallel"),
+				frameLoader.loadFrame(1, 'parallel'),
+				frameLoader.loadFrame(2, 'parallel'),
+				frameLoader.loadFrame(3, 'parallel')
 			];
 
 			//same time
 			await vi.advanceTimersByTimeAsync(15);
 			await Promise.all(loadPromises);
 
-			expect(mockBreakpoint.frames[0]?.status).toBe("success");
-			expect(mockBreakpoint.frames[1]?.status).toBe("success");
-			expect(mockBreakpoint.frames[2]?.status).toBe("success");
+			expect(mockBreakpoint.frames[0]?.status).toBe('success');
+			expect(mockBreakpoint.frames[1]?.status).toBe('success');
+			expect(mockBreakpoint.frames[2]?.status).toBe('success');
 		});
 
-		it("should load multiple frames faster than sequential", async () => {
+		it('should load multiple frames faster than sequential', async () => {
 			const startTime = performance.now();
 
 			const parallelPromises = [
-				frameLoader.loadFrame(1, "parallel"),
-				frameLoader.loadFrame(2, "parallel"),
-				frameLoader.loadFrame(3, "parallel"),
+				frameLoader.loadFrame(1, 'parallel'),
+				frameLoader.loadFrame(2, 'parallel'),
+				frameLoader.loadFrame(3, 'parallel')
 			];
 
 			await vi.advanceTimersByTimeAsync(15);
@@ -209,17 +208,17 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 
 			const sequentialStart = performance.now();
 
 			// Sequential loading
-			await sequentialLoader.loadFrame(1, "sequential");
+			await sequentialLoader.loadFrame(1, 'sequential');
 			await vi.advanceTimersByTimeAsync(15);
-			await sequentialLoader.loadFrame(2, "sequential");
+			await sequentialLoader.loadFrame(2, 'sequential');
 			await vi.advanceTimersByTimeAsync(15);
-			await sequentialLoader.loadFrame(3, "sequential");
+			await sequentialLoader.loadFrame(3, 'sequential');
 			await vi.advanceTimersByTimeAsync(15);
 
 			const sequentialTime = performance.now() - sequentialStart;
@@ -228,7 +227,7 @@ describe("FrameLoader", () => {
 			expect(parallelTime).toBeLessThanOrEqual(sequentialTime);
 		});
 
-		it("should not load the same frame twice in parallel mode", async () => {
+		it('should not load the same frame twice in parallel mode', async () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
@@ -238,15 +237,12 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// same frame parallel
-			const promises = [
-				frameLoader.loadFrame(1, "parallel"),
-				frameLoader.loadFrame(1, "parallel"),
-			];
+			const promises = [frameLoader.loadFrame(1, 'parallel'), frameLoader.loadFrame(1, 'parallel')];
 
 			await vi.advanceTimersByTimeAsync(15);
 			await Promise.all(promises);
@@ -256,9 +252,8 @@ describe("FrameLoader", () => {
 		});
 	});
 
-
-	describe("Mixed Sequential and Parallel Loading", () => {
-		it("should handle mixed sequential and parallel requests correctly", async () => {
+	describe('Mixed Sequential and Parallel Loading', () => {
+		it('should handle mixed sequential and parallel requests correctly', async () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
@@ -268,16 +263,16 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
 			// Mix of sequential and parallel
 			const promises = [
-				frameLoader.loadFrame(1, "sequential"),
-				frameLoader.loadFrame(2, "parallel"),
-				frameLoader.loadFrame(3, "sequential"),
-				frameLoader.loadFrame(4, "parallel"),
+				frameLoader.loadFrame(1, 'sequential'),
+				frameLoader.loadFrame(2, 'parallel'),
+				frameLoader.loadFrame(3, 'sequential'),
+				frameLoader.loadFrame(4, 'parallel')
 			];
 
 			await vi.advanceTimersByTimeAsync(50);
@@ -288,15 +283,15 @@ describe("FrameLoader", () => {
 			expect(mockBreakpoint.frames[2]).not.toBeNull();
 			expect(mockBreakpoint.frames[3]).not.toBeNull();
 
-			expect(mockBreakpoint.frames[0]?.status).toBe("success");
-			expect(mockBreakpoint.frames[1]?.status).toBe("success");
-			expect(mockBreakpoint.frames[2]?.status).toBe("success");
-			expect(mockBreakpoint.frames[3]?.status).toBe("success");
+			expect(mockBreakpoint.frames[0]?.status).toBe('success');
+			expect(mockBreakpoint.frames[1]?.status).toBe('success');
+			expect(mockBreakpoint.frames[2]?.status).toBe('success');
+			expect(mockBreakpoint.frames[3]?.status).toBe('success');
 		});
 	});
 
-	describe("Performance Tracking", () => {
-		it("should track loading duration for each frame", async () => {
+	describe('Performance Tracking', () => {
+		it('should track loading duration for each frame', async () => {
 			const onFrameLoaded = vi.fn();
 
 			vi.useRealTimers();
@@ -308,11 +303,11 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 200,
+				retryDelay: 200
 			});
 			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
-			await frameLoader.loadFrame(1, "parallel");
+			await frameLoader.loadFrame(1, 'parallel');
 
 			expect(onFrameLoaded).toHaveBeenCalledWith(
 				expect.objectContaining({
@@ -320,33 +315,33 @@ describe("FrameLoader", () => {
 					startTime: expect.any(Number),
 					endTime: expect.any(Number),
 					duration: expect.any(Number),
-					status: "success",
+					status: 'success'
 				})
 			);
 
 			const call = onFrameLoaded.mock.calls[0][0];
 			expect(call.duration).toBeGreaterThanOrEqual(0);
 			expect(call.endTime).toBeGreaterThanOrEqual(call.startTime);
-			
+
 			vi.useFakeTimers();
 		});
 	});
 
-	describe("Retry Logic", () => {
-		it("should retry failed frames up to maxRetries", async () => {
+	describe('Retry Logic', () => {
+		it('should retry failed frames up to maxRetries', async () => {
 			const onFrameLoaded = vi.fn();
 			let attempts = 0;
 
 			// Override Image to fail
 			globalThis.Image = class {
-				src = "";
+				src = '';
 				onload: any = null;
 				onerror: any = null;
 				complete = false;
 				constructor() {
 					attempts++;
 					setTimeout(() => {
-						if (this.onerror) this.onerror(new Error("Network Error"));
+						if (this.onerror) this.onerror(new Error('Network Error'));
 					}, 10);
 				}
 			} as any;
@@ -358,14 +353,14 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 100,
+				retryDelay: 100
 			});
 			frameLoader['emitter'].subscribe('frameFailed', onFrameLoaded);
 
-			const loadPromise = frameLoader.loadFrame(1, "parallel");
+			const loadPromise = frameLoader.loadFrame(1, 'parallel');
 
 			// 1st attempt
-			await vi.advanceTimersByTimeAsync(20); 
+			await vi.advanceTimersByTimeAsync(20);
 			// Wait for retry delay
 			await vi.advanceTimersByTimeAsync(100);
 			// 2nd attempt
@@ -378,17 +373,19 @@ describe("FrameLoader", () => {
 			await loadPromise;
 
 			expect(attempts).toBe(3);
-			expect(mockBreakpoint.frames[0]?.status).toBe("error");
-			expect(onFrameLoaded).toHaveBeenCalledWith(expect.objectContaining({ status: "error", attempts: 3 }));
+			expect(mockBreakpoint.frames[0]?.status).toBe('error');
+			expect(onFrameLoaded).toHaveBeenCalledWith(
+				expect.objectContaining({ status: 'error', attempts: 3 })
+			);
 		});
 
-		it("should succeed if retry succeeds", async () => {
+		it('should succeed if retry succeeds', async () => {
 			const onFrameLoaded = vi.fn();
 			let attempts = 0;
 
 			// Fail first time, succeed second
 			globalThis.Image = class {
-				src = "";
+				src = '';
 				onload: any = null;
 				onerror: any = null;
 				complete = false;
@@ -398,7 +395,7 @@ describe("FrameLoader", () => {
 					setTimeout(() => {
 						// Fail on 1st attempt
 						if (attempts === 1) {
-							if (this.onerror) this.onerror(new Error("Fail"));
+							if (this.onerror) this.onerror(new Error('Fail'));
 						} else {
 							// Succeed on 2nd
 							this.complete = true;
@@ -415,11 +412,11 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 5,
 				maxRetries: 3,
-				retryDelay: 10,
+				retryDelay: 10
 			});
 			frameLoader['emitter'].subscribe('frameLoaded', onFrameLoaded);
 
-			const loadPromise = frameLoader.loadFrame(1, "parallel");
+			const loadPromise = frameLoader.loadFrame(1, 'parallel');
 
 			// 1st attempt (fail)
 			await vi.advanceTimersByTimeAsync(10);
@@ -431,14 +428,14 @@ describe("FrameLoader", () => {
 			await loadPromise;
 
 			expect(attempts).toBeGreaterThanOrEqual(2);
-			expect(mockBreakpoint.frames[0]?.status).toBe("success");
+			expect(mockBreakpoint.frames[0]?.status).toBe('success');
 			expect(mockBreakpoint.frames[0]?.attempts).toBeGreaterThanOrEqual(2);
 		});
 	});
 
-	describe("Lazy Loading", () => {
-		it("should init ScrollScrub and load neighbors on update", async () => {
-			const { ScrollScrub } = await import("../scroll-engine/scroll-trigger");
+	describe('Lazy Loading', () => {
+		it('should init ScrollScrub and load neighbors on update', async () => {
+			const { ScrollScrub } = await import('../scroll-engine/scroll-trigger');
 			// Clear any instances from previous tests
 			mockScrollScrubInstances.length = 0;
 
@@ -449,13 +446,13 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 0,
 				maxRetries: 1,
-				retryDelay: 0,
+				retryDelay: 0
 			});
 
 			const loadFrameSpy = vi.spyOn(frameLoader, 'loadFrame');
 
 			// Create a fake trigger element
-			const triggerEl = document.createElement("div");
+			const triggerEl = document.createElement('div');
 			frameLoader.initLazyLoading(triggerEl);
 
 			// ScrollScrub should have been instantiated
@@ -471,16 +468,16 @@ describe("FrameLoader", () => {
 		});
 	});
 
-	describe("Preloading", () => {
-		it("should preload the specified number of frames", async () => {
+	describe('Preloading', () => {
+		it('should preload the specified number of frames', async () => {
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
-				preloadCount: 3, 
+				preloadCount: 3,
 				maxRetries: 1,
-				retryDelay: 0,
+				retryDelay: 0
 			});
 
 			const spy = vi.spyOn(frameLoader, 'loadFrame');
@@ -493,14 +490,14 @@ describe("FrameLoader", () => {
 			expect(spy).toHaveBeenCalledWith(3);
 		});
 	});
-	describe("Mathematical Concurrency & Priority", () => {
-		it("should never exceed maxConcurrency (5) when loading large batches in parallel", async () => {
+	describe('Mathematical Concurrency & Priority', () => {
+		it('should never exceed maxConcurrency (5) when loading large batches in parallel', async () => {
 			let activeFetches = 0;
 			let maxActiveFetches = 0;
-			
+
 			// Mock Image to take exactly 10ms and track concurrency
 			globalThis.Image = class {
-				src = "";
+				src = '';
 				onload: any = null;
 				onerror: any = null;
 				complete = false;
@@ -526,16 +523,16 @@ describe("FrameLoader", () => {
 				preloadCount: 0,
 				maxRetries: 3,
 				retryDelay: 10,
-				maxConcurrency: 5, // Enforce 5
+				maxConcurrency: 5 // Enforce 5
 			});
 
 			const startTime = Date.now();
-			
+
 			const promises = [];
 			for (let i = 1; i <= 20; i++) {
-				promises.push(frameLoader.loadFrame(i, "parallel"));
+				promises.push(frameLoader.loadFrame(i, 'parallel'));
 			}
-			
+
 			await vi.advanceTimersByTimeAsync(100);
 			await Promise.all(promises);
 
@@ -544,9 +541,9 @@ describe("FrameLoader", () => {
 			expect(maxActiveFetches).toBeGreaterThan(0); // prove it actually downloaded
 		});
 
-		it("should preempt low priority queue items with high priority items", async () => {
+		it('should preempt low priority queue items with high priority items', async () => {
 			const loadOrder: number[] = [];
-			
+
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
@@ -555,52 +552,58 @@ describe("FrameLoader", () => {
 				preloadCount: 0,
 				maxRetries: 3,
 				retryDelay: 10,
-				maxConcurrency: 1, // Force 1-by-1 to strictly observe order
+				maxConcurrency: 1 // Force 1-by-1 to strictly observe order
 			});
 
 			// We need a way to spy on which frame is loading when
-			const spy = vi.spyOn(frameLoader as any, "executeNetworkFetch").mockImplementation(async (frameNum: any) => {
-				loadOrder.push(frameNum);
-				await new Promise(r => setTimeout(r, 10)); // simulate 10ms fetch
-			});
+			const spy = vi
+				.spyOn(frameLoader as any, 'executeNetworkFetch')
+				.mockImplementation(async (frameNum: any) => {
+					loadOrder.push(frameNum);
+					await new Promise((r) => setTimeout(r, 10)); // simulate 10ms fetch
+				});
 
 			// Push 5 sequential (low priority) frames
 			const promises = [];
 			for (let i = 1; i <= 5; i++) {
-				promises.push(frameLoader.loadFrame(i, "sequential"));
+				promises.push(frameLoader.loadFrame(i, 'sequential'));
 			}
 			// Push 1 parallel (high priority) frame
-			promises.push(frameLoader.loadFrame(99, "parallel"));
+			promises.push(frameLoader.loadFrame(99, 'parallel'));
 
 			await vi.advanceTimersByTimeAsync(200);
 			await Promise.all(promises);
-			
+
 			// Order should be: 1 (starts immediately, queue empty), 99 (preempts 2, 3, 4, 5), then 2, 3, 4, 5.
 			expect(loadOrder).toEqual([1, 99, 2, 3, 4, 5]);
 		});
 	});
 
-	describe("Garbage Collection & Pre-flight Queue Trimming", () => {
-		it("should reject and clear out-of-bounds frames from the queue without fetching them", async () => {
+	describe('Garbage Collection & Pre-flight Queue Trimming', () => {
+		it('should reject and clear out-of-bounds frames from the queue without fetching them', async () => {
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
-				activeBreakpoint: { ...mockBreakpoint, frameLastId: 200, frames: new Array(200).fill(null) },
+				activeBreakpoint: {
+					...mockBreakpoint,
+					frameLastId: 200,
+					frames: new Array(200).fill(null)
+				},
 				firstFrame: 1,
 				lastFrame: 200,
 				preloadCount: 0,
 				maxRetries: 3,
 				retryDelay: 10,
-				maxConcurrency: 1, // force queuing
+				maxConcurrency: 1 // force queuing
 			});
 
 			// Queue 10 frames sequentially (1-10) using loadFrame behind the scenes
-			const p1 = frameLoader.loadFrame(1, "parallel").catch(() => {});
-			const p2 = frameLoader.loadFrame(2, "parallel").catch(() => {});
-			const p99 = frameLoader.loadFrame(99, "parallel"); // this will wait in queue
-			
+			const p1 = frameLoader.loadFrame(1, 'parallel').catch(() => {});
+			const p2 = frameLoader.loadFrame(2, 'parallel').catch(() => {});
+			const p99 = frameLoader.loadFrame(99, 'parallel'); // this will wait in queue
+
 			let rejects = 0;
-			p99.catch(e => {
-				if(e.name === "AbortError") rejects++;
+			p99.catch((e) => {
+				if (e.name === 'AbortError') rejects++;
 			});
 
 			// Immediately force a massive scroll to frame 190 which will trigger lazyLoadAroundFrame(190),
@@ -613,7 +616,7 @@ describe("FrameLoader", () => {
 			expect((frameLoader as any).queue.length).toBeGreaterThan(0); // the new 190 neighborhood is queued
 		});
 
-		it("should cleanly drop internal Map references (abortControllers, activeRequests) on destroy", async () => {
+		it('should cleanly drop internal Map references (abortControllers, activeRequests) on destroy', async () => {
 			frameLoader = new FrameLoader({
 				emitter: new Emitter(),
 				activeBreakpoint: mockBreakpoint,
@@ -621,10 +624,10 @@ describe("FrameLoader", () => {
 				lastFrame: 10,
 				preloadCount: 0,
 				maxRetries: 1,
-				retryDelay: 0,
+				retryDelay: 0
 			});
 
-			const p = frameLoader.loadFrame(1, "parallel");
+			const p = frameLoader.loadFrame(1, 'parallel');
 
 			expect((frameLoader as any).activeRequests.size).toBe(1);
 			expect((frameLoader as any).abortControllers.size).toBe(1);

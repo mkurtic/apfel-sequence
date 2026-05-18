@@ -1,7 +1,7 @@
-import type { DrawMode, RenderableImage } from "../types/apfelSequence";
-import { scaleToCover } from "../utils/canvas/scaleToCover";
-import { scaleToContain } from "../utils/canvas/scaleToContain";
-import type { Emitter } from "../utils/emitter/emitter";
+import type { DrawMode, RenderableImage } from '../types/apfelSequence';
+import { scaleToCover } from '../utils/canvas/scaleToCover';
+import { scaleToContain } from '../utils/canvas/scaleToContain';
+import type { Emitter } from '../utils/emitter/emitter';
 
 class CanvasRender {
 	private dpr: number;
@@ -11,20 +11,33 @@ class CanvasRender {
 	private lastDrawnFrame: RenderableImage | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
 	private emitter: Emitter;
-	constructor(config: {emitter: Emitter, canvas: HTMLCanvasElement; container: HTMLElement; dpr: number; drawMode: DrawMode | undefined }) {
+	constructor(config: {
+		emitter: Emitter;
+		canvas: HTMLCanvasElement;
+		container: HTMLElement;
+		dpr: number;
+		drawMode: DrawMode | undefined;
+	}) {
 		this.emitter = config.emitter;
 		this.dpr = config.dpr;
 		this.drawMode = config.drawMode;
 		this.canvas = config.canvas;
 		this.container = config.container;
 
-		this.emitter.subscribe("drawFrame", (frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
-			this.drawFrame(frame, fallback);
-		});
+		this.emitter.subscribe(
+			'drawFrame',
+			(frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
+				this.drawFrame(frame, fallback);
+			}
+		);
 	}
 
-	private renderImage(image: RenderableImage, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-		if (this.drawMode === "cover") {
+	private renderImage(
+		image: RenderableImage,
+		canvas: HTMLCanvasElement,
+		ctx: CanvasRenderingContext2D
+	) {
+		if (this.drawMode === 'cover') {
 			scaleToCover(image, canvas, ctx, this.dpr);
 		} else {
 			scaleToContain(image, canvas, ctx, this.dpr);
@@ -33,12 +46,12 @@ class CanvasRender {
 
 	drawFrame = (frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
 		const canvas = this.canvas;
-		const ctx = canvas?.getContext("2d");
+		const ctx = canvas?.getContext('2d');
 		const container = this.container;
 		if (!canvas || !ctx || !container) return;
 
 		ctx.imageSmoothingEnabled = true;
-		ctx.imageSmoothingQuality = "high";
+		ctx.imageSmoothingQuality = 'high';
 
 		const dpr = this.dpr;
 		const width = container.clientWidth * dpr;

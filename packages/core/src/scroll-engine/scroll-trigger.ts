@@ -1,10 +1,10 @@
-import { scrollScrubTicker } from "./scroll-scrub-ticker";
+import { scrollScrubTicker } from './scroll-scrub-ticker';
 
 export type ScrollScrubCallback = {
 	progress: number;
 };
 
-export type OffsetKeyword = "top" | "center" | "bottom";
+export type OffsetKeyword = 'top' | 'center' | 'bottom';
 export type OffsetToken = OffsetKeyword | `${number}%` | `${number}px`;
 export type ScrollOffset = `${OffsetToken} ${OffsetToken}` | (string & {});
 
@@ -20,15 +20,19 @@ export type ScrollScrubProps = {
 	onLeaveBack?: () => void;
 };
 
-function parseOffset(positionStr: string = "top top", elementSize: number, viewportSize: number): number {
+function parseOffset(
+	positionStr: string = 'top top',
+	elementSize: number,
+	viewportSize: number
+): number {
 	const [elementSide, viewportSide] = positionStr.trim().split(/\s+/);
 
-	const resolveValue = (token: string = "top", size: number): number => {
-		if (token === "top") return 0;
-		if (token === "center") return size / 2;
-		if (token === "bottom") return size;
-		if (token.endsWith("%")) return (parseFloat(token) / 100) * size;
-		if (token.endsWith("px")) return parseFloat(token);
+	const resolveValue = (token: string = 'top', size: number): number => {
+		if (token === 'top') return 0;
+		if (token === 'center') return size / 2;
+		if (token === 'bottom') return size;
+		if (token.endsWith('%')) return (parseFloat(token) / 100) * size;
+		if (token.endsWith('px')) return parseFloat(token);
 		return 0;
 	};
 
@@ -48,7 +52,7 @@ export class ScrollScrub {
 	}
 
 	init = (): void => {
-		if (typeof window === "undefined") return;
+		if (typeof window === 'undefined') return;
 
 		scrollScrubTicker.register(this.tick);
 
@@ -62,16 +66,25 @@ export class ScrollScrub {
 					scrollScrubTicker.deactivate(this.tick);
 				}
 			},
-			{ rootMargin: "10px 0px 10px 0px" }
+			{ rootMargin: '10px 0px 10px 0px' }
 		);
 
 		this.observer.observe(this.props.trigger);
 	};
 
 	update = (): void => {
-		if (typeof window === "undefined") return;
+		if (typeof window === 'undefined') return;
 
-		const { trigger, start = "top top", end = "bottom top", onUpdate, onEnter, onLeave, onEnterBack, onLeaveBack } = this.props;
+		const {
+			trigger,
+			start = 'top top',
+			end = 'bottom top',
+			onUpdate,
+			onEnter,
+			onLeave,
+			onEnterBack,
+			onLeaveBack
+		} = this.props;
 
 		const rect = trigger.getBoundingClientRect();
 		const vh = window.innerHeight;
@@ -80,7 +93,7 @@ export class ScrollScrub {
 
 		const startOffset = parseOffset(start, elementHeight, vh);
 		const endOffset = parseOffset(end, elementHeight, vh);
-		const animationLength = (elementTop + endOffset) - (elementTop + startOffset);
+		const animationLength = elementTop + endOffset - (elementTop + startOffset);
 
 		if (animationLength <= 0) return;
 

@@ -1,6 +1,5 @@
-import type { BreakpointConfig } from "../types/apfelSequence";
-import type { Emitter } from "../utils/emitter/emitter";
-
+import type { BreakpointConfig } from '../types/apfelSequence';
+import type { Emitter } from '../utils/emitter/emitter';
 
 export class ActiveBreakpoint<T extends BreakpointConfig> {
 	private breakpoints: T[];
@@ -11,7 +10,7 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 	constructor(breakpoints: T[], emitter: Emitter) {
 		this.emitter = emitter;
 		if (breakpoints.length === 0) {
-			throw new Error("ActiveBreakpoint requires at least one breakpoint");
+			throw new Error('ActiveBreakpoint requires at least one breakpoint');
 		}
 
 		this.breakpoints = breakpoints.sort((a, b) => (a.breakpointMin ?? 0) - (b.breakpointMin ?? 0));
@@ -27,7 +26,9 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 			const next = this.breakpoints[i + 1];
 			// Check if current max overlaps with next min
 			if ((current.breakpointMax ?? Infinity) >= (next.breakpointMin ?? 0)) {
-				throw new Error(`Breakpoints overlap: ${current.name} ends at ${current.breakpointMax} and ${next.name} starts at ${next.breakpointMin}`);
+				throw new Error(
+					`Breakpoints overlap: ${current.name} ends at ${current.breakpointMax} and ${next.name} starts at ${next.breakpointMin}`
+				);
 			}
 		}
 	}
@@ -42,23 +43,22 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 
 	init() {
 		this.update();
-		if(typeof window == "undefined") return;
-		window.addEventListener("resize", this.resizeHandler);
-		this.emitter.emit("breakpointChanged", this.active);
+		if (typeof window == 'undefined') return;
+		window.addEventListener('resize', this.resizeHandler);
+		this.emitter.emit('breakpointChanged', this.active);
 	}
 
 	destroy() {
-		if (typeof window == "undefined") return;
-		window.removeEventListener("resize", this.resizeHandler);
+		if (typeof window == 'undefined') return;
+		window.removeEventListener('resize', this.resizeHandler);
 	}
 
 	getActive(): T {
 		return this.active;
 	}
 
-
 	private update() {
-		if (typeof window === "undefined") return;
+		if (typeof window === 'undefined') return;
 		const width = window.innerWidth;
 
 		const next = this.breakpoints.find((bp) => {
@@ -73,7 +73,7 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 
 		if (next !== this.active) {
 			this.active = next;
-			this.emitter.emit("breakpointChanged", this.active);
+			this.emitter.emit('breakpointChanged', this.active);
 		}
 	}
 }

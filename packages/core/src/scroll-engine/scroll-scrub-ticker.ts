@@ -31,7 +31,7 @@ class Ticker {
 	}
 
 	private start(): void {
-		if (typeof requestAnimationFrame === "undefined") return;
+		if (typeof requestAnimationFrame === 'undefined') return;
 		if (this.rafId !== null) return; // Already running
 		const loop = () => {
 			this.activeCallbacks.forEach((cb) => cb());

@@ -1,6 +1,11 @@
-import type { RenderableImage } from "../../types/apfelSequence";
+import type { RenderableImage } from '../../types/apfelSequence';
 
-export const scaleToContain = (img: RenderableImage, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, dpr: number) => {
+export const scaleToContain = (
+	img: RenderableImage,
+	canvas: HTMLCanvasElement,
+	ctx: CanvasRenderingContext2D,
+	dpr: number
+) => {
 	if (!img || !canvas || !ctx) return;
 
 	const cw = canvas.width;

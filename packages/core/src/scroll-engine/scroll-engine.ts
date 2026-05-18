@@ -1,5 +1,5 @@
-import type { ScrollEngineProps } from "../types/apfelSequence";
-import { ScrollScrub } from "./scroll-trigger";
+import type { ScrollEngineProps } from '../types/apfelSequence';
+import { ScrollScrub } from './scroll-trigger';
 
 export class ScrollEngine {
 	private scrub: ScrollScrub | null = null;
@@ -12,7 +12,14 @@ export class ScrollEngine {
 	}
 
 	public init(): void {
-		const { containerRef, totalFrames, onFrameChange, start = "top top", end = "bottom top", scrub = true } = this.props;
+		const {
+			containerRef,
+			totalFrames,
+			onFrameChange,
+			start = 'top top',
+			end = 'bottom top',
+			scrub = true
+		} = this.props;
 
 		const element = containerRef;
 		if (!element) return;
@@ -30,7 +37,7 @@ export class ScrollEngine {
 					this.lastFrame = frameIndex;
 					onFrameChange(frameIndex);
 				}
-			},
+			}
 		});
 
 		this.scrub.init();

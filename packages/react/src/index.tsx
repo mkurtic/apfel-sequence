@@ -1,9 +1,9 @@
-"use client"
-import { useEffect, useRef } from "react";
-import { ApfelSequenceEngine } from "@apfel-sequence/core";
-import type { ApfelSequenceProps } from "@apfel-sequence/core";
+'use client';
+import { useEffect, useRef } from 'react';
+import { ApfelSequenceEngine } from '@apfel-sequence/core';
+import type { ApfelSequenceProps } from '@apfel-sequence/core';
 
-export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, "canvas" | "container">;
+export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, 'canvas' | 'container'>;
 
 const ApfelSequence = (props: ApfelSequenceReactProps) => {
 	const { assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt } = props;
@@ -30,7 +30,7 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 			loadingConfig,
 			alt,
 			canvas: canvasRef.current,
-			container: containerRef.current,
+			container: containerRef.current
 		});
 
 		return () => {
@@ -47,14 +47,14 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 				networkPolicy,
 				scrollConfig,
 				loadingConfig,
-				alt,
+				alt
 			});
 		}
 	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt]);
 
 	return (
 		<div className="apfel-container" ref={containerRef}>
-			<canvas className="apfel-sequence" ref={canvasRef} aria-label={alt} role="img"/>
+			<canvas className="apfel-sequence" ref={canvasRef} aria-label={alt} role="img" />
 			{/*Fallback only img tag*/}
 		</div>
 	);

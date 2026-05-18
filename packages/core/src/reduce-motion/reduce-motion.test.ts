@@ -1,88 +1,88 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { PrefersReducedMotion } from "./reduce-motion";
-import { Emitter } from "../utils/emitter/emitter";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { PrefersReducedMotion } from './reduce-motion';
+import { Emitter } from '../utils/emitter/emitter';
 
-describe("PrefersReducedMotion", () => {
-    let matchMediaMock: any;
-    let addEventListenerMock: any;
-    let removeEventListenerMock: any;
-    let matches = false;
-    let changeHandler: ((e: any) => void) | null = null;
+describe('PrefersReducedMotion', () => {
+	let matchMediaMock: any;
+	let addEventListenerMock: any;
+	let removeEventListenerMock: any;
+	let matches = false;
+	let changeHandler: ((e: any) => void) | null = null;
 
-    beforeEach(() => {
-        matches = false;
-        changeHandler = null;
-        
-        addEventListenerMock = vi.fn((event, handler) => {
-            if (event === "change") {
-                changeHandler = handler;
-            }
-        });
-        
-        removeEventListenerMock = vi.fn();
+	beforeEach(() => {
+		matches = false;
+		changeHandler = null;
 
-        matchMediaMock = vi.fn().mockImplementation((query) => {
-            return {
-                matches,
-                addEventListener: addEventListenerMock,
-                removeEventListener: removeEventListenerMock,
-                media: query,
-                onchange: null,
-                addListener: vi.fn(), // deprecated but often present
-                removeListener: vi.fn(), // deprecated but often present
-                dispatchEvent: vi.fn(),
-            };
-        });
+		addEventListenerMock = vi.fn((event, handler) => {
+			if (event === 'change') {
+				changeHandler = handler;
+			}
+		});
 
-        vi.stubGlobal("window", {
-            matchMedia: matchMediaMock,
-        });
-    });
+		removeEventListenerMock = vi.fn();
 
-    afterEach(() => {
-        vi.unstubAllGlobals();
-    });
+		matchMediaMock = vi.fn().mockImplementation((query) => {
+			return {
+				matches,
+				addEventListener: addEventListenerMock,
+				removeEventListener: removeEventListenerMock,
+				media: query,
+				onchange: null,
+				addListener: vi.fn(), // deprecated but often present
+				removeListener: vi.fn(), // deprecated but often present
+				dispatchEvent: vi.fn()
+			};
+		});
 
-    it("should initialize with false if matchMedia returns false", () => {
-        matches = false;
-        const motion = new PrefersReducedMotion(new Emitter());
-        expect(motion.value).toBe(false);
-    });
+		vi.stubGlobal('window', {
+			matchMedia: matchMediaMock
+		});
+	});
 
-    it("should initialize with true if matchMedia returns true", () => {
-        matches = true;
-        const motion = new PrefersReducedMotion(new Emitter());
-        expect(motion.value).toBe(true);
-    });
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
 
-    it("should set up listener on init", () => {
-        new PrefersReducedMotion(new Emitter());
-        expect(matchMediaMock).toHaveBeenCalledWith("(prefers-reduced-motion: reduce)");
-        expect(addEventListenerMock).toHaveBeenCalledWith("change", expect.any(Function));
-    });
+	it('should initialize with false if matchMedia returns false', () => {
+		matches = false;
+		const motion = new PrefersReducedMotion(new Emitter());
+		expect(motion.value).toBe(false);
+	});
 
-    it("should call onChange when media query changes", () => {
-        const emitter = new Emitter();
-        const emitSpy = vi.spyOn(emitter, 'emit');
-        new PrefersReducedMotion(emitter);
+	it('should initialize with true if matchMedia returns true', () => {
+		matches = true;
+		const motion = new PrefersReducedMotion(new Emitter());
+		expect(motion.value).toBe(true);
+	});
 
-        if (changeHandler) {
-            changeHandler({ matches: true } as MediaQueryListEvent);
-        }
+	it('should set up listener on init', () => {
+		new PrefersReducedMotion(new Emitter());
+		expect(matchMediaMock).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)');
+		expect(addEventListenerMock).toHaveBeenCalledWith('change', expect.any(Function));
+	});
 
-        expect(emitSpy).toHaveBeenCalledWith("motionPreferenceChanged", true);
-    });
+	it('should call onChange when media query changes', () => {
+		const emitter = new Emitter();
+		const emitSpy = vi.spyOn(emitter, 'emit');
+		new PrefersReducedMotion(emitter);
 
-    it("should remove listener on destroy", () => {
-        const motion = new PrefersReducedMotion(new Emitter());
-        motion.destroy();
-        expect(removeEventListenerMock).toHaveBeenCalledWith("change", expect.any(Function));
-    });
+		if (changeHandler) {
+			changeHandler({ matches: true } as MediaQueryListEvent);
+		}
 
-    it("should handle SSR, no window", () => {
-        vi.stubGlobal("window", undefined);
-        const motion = new PrefersReducedMotion(new Emitter());
-        expect(motion.value).toBe(false);
-        // Should not crash
-    });
+		expect(emitSpy).toHaveBeenCalledWith('motionPreferenceChanged', true);
+	});
+
+	it('should remove listener on destroy', () => {
+		const motion = new PrefersReducedMotion(new Emitter());
+		motion.destroy();
+		expect(removeEventListenerMock).toHaveBeenCalledWith('change', expect.any(Function));
+	});
+
+	it('should handle SSR, no window', () => {
+		vi.stubGlobal('window', undefined);
+		const motion = new PrefersReducedMotion(new Emitter());
+		expect(motion.value).toBe(false);
+		// Should not crash
+	});
 });

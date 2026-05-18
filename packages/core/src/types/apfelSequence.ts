@@ -1,6 +1,6 @@
-import { Emitter } from "../utils/emitter/emitter";
-export type DrawMode = "cover" | "contain";
-export type NetworkPolicy = "adaptive" | "fallback-only";
+import { Emitter } from '../utils/emitter/emitter';
+export type DrawMode = 'cover' | 'contain';
+export type NetworkPolicy = 'adaptive' | 'fallback-only';
 export type RenderableImage = HTMLImageElement | ImageBitmap;
 
 export interface Frame {
@@ -8,7 +8,7 @@ export interface Frame {
 	startTime: number;
 	endTime: number;
 	duration: number;
-	status: "success" | "error" | "pending";
+	status: 'success' | 'error' | 'pending';
 	url: string;
 	image: RenderableImage | null;
 	attempts: number;
@@ -48,7 +48,7 @@ export type AssetsConfig = AssetConfig[];
  */
 export interface LoadingConfig {
 	/** Loading strategy: 'eager' preloads immediately, 'lazy' preloads when triggered */
-	loadingMode?: "eager" | "lazy";
+	loadingMode?: 'eager' | 'lazy';
 
 	/** Number of frames to preload initially (defaults calculated in component if not provided) */
 	preloadCount?: number;
@@ -149,7 +149,7 @@ export interface ApfelSequenceProps {
 
 	/* Canvas's container */
 	container: HTMLElement;
-	
+
 	/** Whether to clear the cache when the breakpoint changes (default: false) */
 	clearCacheOnBreakpointChange?: boolean;
 }

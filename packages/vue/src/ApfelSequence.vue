@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from "vue";
-import { ApfelSequenceEngine } from "@apfel-sequence/core";
-import type { ApfelSequenceProps } from "@apfel-sequence/core";
+import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ApfelSequenceEngine } from '@apfel-sequence/core';
+import type { ApfelSequenceProps } from '@apfel-sequence/core';
 
-export type ApfelSequenceVueProps = Omit<ApfelSequenceProps, "canvas" | "container">;
+export type ApfelSequenceVueProps = Omit<ApfelSequenceProps, 'canvas' | 'container'>;
 
 const props = defineProps<ApfelSequenceVueProps>();
 let apfelSequence: ApfelSequenceEngine;
@@ -31,15 +31,19 @@ onMounted(() => {
 	apfelSequence = new ApfelSequenceEngine({
 		...props,
 		canvas: canvasRef.value,
-		container: containerRef.value,
+		container: containerRef.value
 	});
 });
 
-watch(props, (newProps) => {
-	if (apfelSequence) {
-		apfelSequence.updateConfig(newProps);
-	}
-}, { deep: true });
+watch(
+	props,
+	(newProps) => {
+		if (apfelSequence) {
+			apfelSequence.updateConfig(newProps);
+		}
+	},
+	{ deep: true }
+);
 
 onUnmounted(() => {
 	apfelSequence?.destroy();

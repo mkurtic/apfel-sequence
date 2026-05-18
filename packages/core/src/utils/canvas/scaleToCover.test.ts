@@ -1,32 +1,32 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import type { Mock } from "vitest";
-import { scaleToContain } from "./scaleToContain";
-import { scaleToCover } from "./scaleToCover";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import { scaleToContain } from './scaleToContain';
+import { scaleToCover } from './scaleToCover';
 
-describe("scaleToContain / scaleToCover", () => {
+describe('scaleToContain / scaleToCover', () => {
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
 	let img: HTMLImageElement;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		canvas = document.createElement("canvas");
+		canvas = document.createElement('canvas');
 		canvas.width = 800;
 		canvas.height = 600;
 
 		ctx = {
 			clearRect: vi.fn(),
-			drawImage: vi.fn(),
+			drawImage: vi.fn()
 		} as unknown as CanvasRenderingContext2D;
 
-		vi.spyOn(canvas, "getContext").mockReturnValue(ctx);
+		vi.spyOn(canvas, 'getContext').mockReturnValue(ctx);
 
-		img = document.createElement("img");
+		img = document.createElement('img');
 		img.width = 400;
 		img.height = 300;
 	});
 
-	it("scaleToContain should scale image to fit inside canvas", () => {
+	it('scaleToContain should scale image to fit inside canvas', () => {
 		scaleToContain(img, canvas, ctx, 1);
 
 		const expectedScale = Math.min(canvas.width / img.width, canvas.height / img.height);
@@ -43,7 +43,7 @@ describe("scaleToContain / scaleToCover", () => {
 		expect(drawArgs[4]).toBeCloseTo(img.height * expectedScale, 2);
 	});
 
-	it("scaleToCover should scale image to cover entire canvas", () => {
+	it('scaleToCover should scale image to cover entire canvas', () => {
 		scaleToCover(img, canvas, ctx, 1);
 
 		const expectedScale = Math.max(canvas.width / img.width, canvas.height / img.height);
@@ -60,7 +60,7 @@ describe("scaleToContain / scaleToCover", () => {
 		expect(drawArgs[4]).toBeCloseTo(img.height * expectedScale, 2);
 	});
 
-	it("should do nothing if img, canvas or ctx is missing", () => {
+	it('should do nothing if img, canvas or ctx is missing', () => {
 		expect(() => scaleToContain(null as any, canvas, ctx, 1)).not.toThrow();
 		expect(() => scaleToCover(img, null as any, ctx, 1)).not.toThrow();
 		expect(() => scaleToCover(img, canvas, null as any, 1)).not.toThrow();

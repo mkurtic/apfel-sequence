@@ -25,6 +25,15 @@
 		},
 		"typeRoots": ["node_modules/@types", "packages/types"]
 	},
-	"include": ["packages/core/src", "packages/vanilla/src", "packages/react/src", "packages/vue/src", "playgrounds/**/*", "src", "test", "src/types"],
+	"include": [
+		"packages/core/src",
+		"packages/vanilla/src",
+		"packages/react/src",
+		"packages/vue/src",
+		"playgrounds/**/*",
+		"src",
+		"test",
+		"src/types"
+	],
 	"exclude": ["dist", "node_modules"]
 }
