@@ -1,5 +1,12 @@
 # @apfel-sequence/vanilla
 
+## 0.1.2
+
+### Patch Changes
+
+- Add an IIFE build (`apfel-sequence.min.js`) for direct `<script>` tag usage without modules and add `unpkg` field to package.json.
+  - @apfel-sequence/core@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

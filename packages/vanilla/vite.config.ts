@@ -19,8 +19,12 @@ export default defineConfig({
 		lib: {
 			entry: path.resolve(__dirname, "src/index.ts"),
 			name: "ApfelSequence",
-			formats: ["es", "cjs"],
-			fileName: (format) => (format === "es" ? "apfel-sequence.es.js" : "apfel-sequence.cjs"),
+			formats: ["es", "cjs", "iife"],
+			fileName: (format) => {
+				if (format === "es") return "apfel-sequence.es.js";
+				if (format === "cjs") return "apfel-sequence.cjs";
+				return "apfel-sequence.min.js";
+			},
 		},
 		rollupOptions: {
 		},

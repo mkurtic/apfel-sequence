@@ -1,5 +1,11 @@
 # @apfel-sequence/react
 
+## 0.1.2
+
+### Patch Changes
+
+- @apfel-sequence/core@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
