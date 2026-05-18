@@ -1,5 +1,12 @@
 # @apfel-sequence/vanilla
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix: Bundle @apfel-sequence/core into the vanilla package for standalone CDN and <script> tag support without runtime resolution errors.
+  - @apfel-sequence/core@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
