@@ -41,10 +41,25 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 		};
 	}
 
+	private getBreakpointForWidth(width: number): T {
+		const next = this.breakpoints.find((bp) => {
+			const min = bp.breakpointMin ?? 0;
+			const max = bp.breakpointMax ?? Infinity;
+			return width >= min && width <= max;
+		});
+
+		if (!next) {
+			throw new Error(`No breakpoint found for width ${width}, please fix your breakpoints.`);
+		}
+
+		return next;
+	}
+
 	init() {
-		this.update();
-		if (typeof window == 'undefined') return;
-		window.addEventListener('resize', this.resizeHandler);
+		if (typeof window !== 'undefined') {
+			window.addEventListener('resize', this.resizeHandler);
+			this.active = this.getBreakpointForWidth(window.innerWidth);
+		}
 		this.emitter.emit('breakpointChanged', this.active);
 	}
 
@@ -59,17 +74,8 @@ export class ActiveBreakpoint<T extends BreakpointConfig> {
 
 	private update() {
 		if (typeof window === 'undefined') return;
-		const width = window.innerWidth;
 
-		const next = this.breakpoints.find((bp) => {
-			const min = bp.breakpointMin ?? 0;
-			const max = bp.breakpointMax ?? Infinity;
-			return width >= min && width <= max;
-		});
-
-		if (!next) {
-			throw new Error(`No breakpoint found for width ${width}, please fix your breakpoints.`);
-		}
+		const next = this.getBreakpointForWidth(window.innerWidth);
 
 		if (next !== this.active) {
 			this.active = next;
