@@ -300,21 +300,77 @@ export class ApfelSequenceEngine {
 		this.loadingConfig?.onFrameLoaded?.(frame);
 	};
 
+	/**
+	 * Shallow-compares two plain objects by value.
+	 * Returns true if both are the same reference, or if all their enumerable
+	 * keys exist on both sides with strictly-equal values.
+	 */
+	private shallowEqual(
+		a: Record<string, unknown> | undefined,
+		b: Record<string, unknown> | undefined
+	): boolean {
+		if (a === b) return true;
+		if (!a || !b) return false;
+		const keysA = Object.keys(a);
+		const keysB = Object.keys(b);
+		if (keysA.length !== keysB.length) return false;
+		return keysA.every((k) => a[k] === b[k]);
+	}
+
 	public updateConfig = (newConfig: Partial<ApfelSequenceProps>) => {
+		const prev = this.config;
 		this.config = { ...this.config, ...newConfig };
 		this.clearCacheOnBreakpointChange = this.config.clearCacheOnBreakpointChange ?? false;
 
-		this.tlPreloadFirstChunk?.destroy();
-		this.scrollEngine?.destroy();
-		this.frameLoaderManager?.destroy();
-		this.activeBreakpointManager?.destroy();
+		// DOM references or asset definitions changed → full teardown and reinit.
+		// These changes are structural and cannot be patched in place.
+		const needsFullReinit =
+			prev.assetsConfig !== this.config.assetsConfig ||
+			prev.networkPolicy !== this.config.networkPolicy ||
+			prev.container !== this.config.container ||
+			prev.canvas !== this.config.canvas;
 
-		if (this.resizeObserver) {
-			this.resizeObserver.disconnect();
-			this.resizeObserver = null;
+		if (needsFullReinit) {
+			this.tlPreloadFirstChunk?.destroy();
+			this.scrollEngine?.destroy();
+			this.frameLoaderManager?.destroy();
+			this.activeBreakpointManager?.destroy();
+			if (this.resizeObserver) {
+				this.resizeObserver.disconnect();
+				this.resizeObserver = null;
+			}
+			this.init(this.config);
+			return;
 		}
 
-		this.init(this.config);
+		// Only scroll positions changed → rebuild ScrollEngine, leave frames untouched.
+		if (
+			!this.shallowEqual(
+				prev.scrollConfig as Record<string, unknown>,
+				this.config.scrollConfig as Record<string, unknown>
+			)
+		) {
+			this.scrollEngine?.destroy();
+			this.scrollConfig = this.normalizeScrollConfig(this.config.scrollConfig);
+			const fallbackOnly =
+				this.config.networkPolicy === 'fallback-only' || this.prefersReducedMotion?.value;
+			this.scrollEngine = new ScrollEngine({
+				containerRef: this.config.container,
+				totalFrames: fallbackOnly ? 1 : this.totalFrames,
+				onFrameChange: fallbackOnly ? () => {} : this.handleFrameChange,
+				scrub: this.scrollConfig.scrub,
+				start: this.scrollConfig.start,
+				end: this.scrollConfig.end,
+				markers: this.scrollConfig.markers,
+				loadingMode: this.loadingConfig?.loadingMode,
+				lazyLoadAroundFrame: fallbackOnly ? undefined : () => {}
+			});
+		}
+
+		// drawMode only affects how the current frame is rendered — no reinit needed.
+		if (prev.drawMode !== this.config.drawMode) {
+			this.canvasRender.setDrawMode(this.config.drawMode);
+		}
 	};
 
 	handleFrameChange = (frameId: number) => {

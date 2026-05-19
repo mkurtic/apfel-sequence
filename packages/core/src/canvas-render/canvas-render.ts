@@ -7,6 +7,7 @@ class CanvasRender {
 	private dpr: number;
 	private drawMode: DrawMode | undefined;
 	private canvas: HTMLCanvasElement;
+	private ctx: CanvasRenderingContext2D | null;
 	private container: HTMLElement;
 	private lastDrawnFrame: RenderableImage | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
@@ -22,6 +23,7 @@ class CanvasRender {
 		this.dpr = config.dpr;
 		this.drawMode = config.drawMode;
 		this.canvas = config.canvas;
+		this.ctx = config.canvas.getContext('2d');
 		this.container = config.container;
 
 		this.emitter.subscribe(
@@ -30,6 +32,13 @@ class CanvasRender {
 				this.drawFrame(frame, fallback);
 			}
 		);
+	}
+
+	setDrawMode(drawMode: DrawMode | undefined) {
+		this.drawMode = drawMode;
+		if (this.lastDrawnFrame) {
+			this.drawFrame(this.lastDrawnFrame, null);
+		}
 	}
 
 	private renderImage(
@@ -46,7 +55,7 @@ class CanvasRender {
 
 	drawFrame = (frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
 		const canvas = this.canvas;
-		const ctx = canvas?.getContext('2d');
+		const ctx = this.ctx;
 		const container = this.container;
 		if (!canvas || !ctx || !container) return;
 

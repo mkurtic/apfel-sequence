@@ -1,15 +1,48 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { ApfelSequenceEngine } from '@apfel-sequence/core';
 import type { ApfelSequenceProps } from '@apfel-sequence/core';
 
 export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, 'canvas' | 'container'>;
 
 const ApfelSequence = (props: ApfelSequenceReactProps) => {
-	const { assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt } = props;
+	const {
+		assetsConfig,
+		drawMode,
+		networkPolicy,
+		scrollConfig,
+		loadingConfig,
+		clearCacheOnBreakpointChange,
+		alt
+	} = props;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const engineRef = useRef<ApfelSequenceEngine | null>(null);
+
+	// Stabilize object props by value so that inline object literals passed by the
+	// parent (e.g. scrollConfig={{ start: 'top top' }}) don't create new references
+	// on every render and trigger a needless updateConfig call.
+	const stableScrollConfig = useMemo(
+		() => scrollConfig,
+		// Deps are the primitive values inside scrollConfig, not the object reference.
+		// This prevents spurious updateConfig calls when inline objects are passed as props.
+		[scrollConfig?.start, scrollConfig?.end, scrollConfig?.scrub, scrollConfig?.markers]
+	);
+
+	const stableLoadingConfig = useMemo(
+		() => loadingConfig,
+		// Deps are the primitive values inside loadingConfig, not the object reference.
+		[
+			loadingConfig?.loadingMode,
+			loadingConfig?.trigger,
+			loadingConfig?.start,
+			loadingConfig?.preloadCount,
+			loadingConfig?.maxRetries,
+			loadingConfig?.retryDelay,
+			loadingConfig?.maxConcurrency,
+			loadingConfig?.markers
+		]
+	);
 
 	useEffect(() => {
 		if (!canvasRef.current) {
@@ -26,8 +59,9 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 			assetsConfig,
 			drawMode,
 			networkPolicy,
-			scrollConfig,
-			loadingConfig,
+			scrollConfig: stableScrollConfig,
+			loadingConfig: stableLoadingConfig,
+			clearCacheOnBreakpointChange,
 			alt,
 			canvas: canvasRef.current,
 			container: containerRef.current
@@ -45,12 +79,21 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 				assetsConfig,
 				drawMode,
 				networkPolicy,
-				scrollConfig,
-				loadingConfig,
+				scrollConfig: stableScrollConfig,
+				loadingConfig: stableLoadingConfig,
+				clearCacheOnBreakpointChange,
 				alt
 			});
 		}
-	}, [assetsConfig, drawMode, networkPolicy, scrollConfig, loadingConfig, alt]);
+	}, [
+		assetsConfig,
+		drawMode,
+		networkPolicy,
+		stableScrollConfig,
+		stableLoadingConfig,
+		clearCacheOnBreakpointChange,
+		alt
+	]);
 
 	return (
 		<div className="apfel-container" ref={containerRef}>

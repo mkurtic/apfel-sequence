@@ -80,7 +80,7 @@ describe('CanvasRender', () => {
 		const frame = document.createElement('img');
 		render.drawFrame(frame, null);
 
-		expect(scaleToCoverModule.scaleToCover).toHaveBeenCalledWith(frame, canvas, ctx, dpr);
+		expect(scaleToCoverModule.scaleToCover).toHaveBeenCalledWith(frame, canvas, ctx);
 		expect(scaleToContainModule.scaleToContain).not.toHaveBeenCalled();
 	});
 
@@ -95,7 +95,7 @@ describe('CanvasRender', () => {
 		const frame = document.createElement('img');
 		render.drawFrame(frame, null);
 
-		expect(scaleToContainModule.scaleToContain).toHaveBeenCalledWith(frame, canvas, ctx, dpr);
+		expect(scaleToContainModule.scaleToContain).toHaveBeenCalledWith(frame, canvas, ctx);
 		expect(scaleToCoverModule.scaleToCover).not.toHaveBeenCalled();
 	});
 
@@ -137,7 +137,6 @@ describe('CanvasRender', () => {
 		expect(scaleToCoverModule.scaleToCover).toHaveBeenCalledWith(
 			frame1,
 			expect.anything(),
-			expect.anything(),
 			expect.anything()
 		);
 
@@ -147,7 +146,6 @@ describe('CanvasRender', () => {
 		render.drawFrame(null, null);
 		expect(scaleToCoverModule.scaleToCover).toHaveBeenCalledWith(
 			frame1,
-			expect.anything(),
 			expect.anything(),
 			expect.anything()
 		);
@@ -167,7 +165,6 @@ describe('CanvasRender', () => {
 		render.drawFrame(null, fallback);
 		expect(scaleToCoverModule.scaleToCover).toHaveBeenCalledWith(
 			fallback,
-			expect.anything(),
 			expect.anything(),
 			expect.anything()
 		);
