@@ -124,8 +124,7 @@ export class ApfelSequenceEngine {
 					this.loadingConfig.trigger,
 					this.loadingConfig.start,
 					'100%',
-					true,
-					this.loadingConfig.markers
+					true
 				);
 			} else {
 				await this.frameLoaderManager.preloadInitialFrames();
