@@ -40,7 +40,7 @@
 		"format": "prettier --write \"**/*.{js,ts,tsx,vue,mts,cjs,mjs,json,md,css,html}\"",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"prepare": "husky"
+		"prepare": "husky || true"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.8",
