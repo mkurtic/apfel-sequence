@@ -3,8 +3,7 @@ import type { RenderableImage } from '../../types/apfelSequence';
 export const scaleToCover = (
 	img: RenderableImage,
 	canvas: HTMLCanvasElement,
-	ctx: CanvasRenderingContext2D,
-	dpr: number
+	ctx: CanvasRenderingContext2D
 ) => {
 	if (!img || !canvas || !ctx) return;
 

@@ -148,8 +148,6 @@ class FrameLoader {
 		const controller = new AbortController();
 		this.abortControllers.set(index, controller);
 
-		let lastError: unknown;
-
 		for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
 			try {
 				const img = await this.loadInternal(src, controller.signal);
@@ -170,14 +168,13 @@ class FrameLoader {
 				this.abortControllers.delete(index);
 				return;
 			} catch (error) {
-				lastError = error;
-
 				if (error instanceof Error && error.name === 'AbortError') {
 					this.abortControllers.delete(index);
 					return; // exit without emitting failure
 				}
 
 				if (attempt < this.maxRetries) {
+					/*
 					const endTime = performance.now();
 					const stat: Frame = {
 						frameNumber,
@@ -190,6 +187,7 @@ class FrameLoader {
 						attempts: attempt,
 						index: index
 					};
+					*/
 					await new Promise((resolve) => setTimeout(resolve, this.retryDelay));
 					continue;
 				}
@@ -346,8 +344,7 @@ class FrameLoader {
 		trigger: HTMLElement | string,
 		start: string = 'top top',
 		end: string = '100%',
-		scrub: boolean = true,
-		markers: boolean = false
+		scrub: boolean = true
 	): void => {
 		const totalFrames = this.lastFrame - this.firstFrame + 1;
 		const triggerEl =

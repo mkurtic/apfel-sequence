@@ -38,9 +38,9 @@ class CanvasRender {
 		ctx: CanvasRenderingContext2D
 	) {
 		if (this.drawMode === 'cover') {
-			scaleToCover(image, canvas, ctx, this.dpr);
+			scaleToCover(image, canvas, ctx);
 		} else {
-			scaleToContain(image, canvas, ctx, this.dpr);
+			scaleToContain(image, canvas, ctx);
 		}
 	}
 
