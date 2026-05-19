@@ -44,15 +44,40 @@ export class ScrollScrub {
 	private observer: IntersectionObserver | null = null;
 	private lastProgress: number = -1;
 
+	private scrollStart: number = 0;
+	private scrollEnd: number = 0;
+	private animationLength: number = 0;
+	private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+	private isTouchDevice: boolean = false;
+
 	private readonly tick: () => void;
+	private readonly handleResize: () => void;
 
 	constructor(props: ScrollScrubProps) {
 		this.props = props;
+		this.isTouchDevice =
+			typeof window !== 'undefined' &&
+			window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 		this.tick = this.update.bind(this); // Bind once so the same reference is used for register/unregister
+		this.handleResize = () => {
+			if (this.isTouchDevice) {
+				if (this.resizeTimeout !== null) {
+					clearTimeout(this.resizeTimeout);
+				}
+				this.resizeTimeout = setTimeout(() => {
+					this.refresh();
+				}, 150);
+			} else {
+				this.refresh();
+			}
+		};
 	}
 
 	init = (): void => {
 		if (typeof window === 'undefined') return;
+
+		this.refresh();
+		window.addEventListener('resize', this.handleResize);
 
 		scrollScrubTicker.register(this.tick);
 
@@ -72,19 +97,10 @@ export class ScrollScrub {
 		this.observer.observe(this.props.trigger);
 	};
 
-	update = (): void => {
+	refresh = (): void => {
 		if (typeof window === 'undefined') return;
 
-		const {
-			trigger,
-			start = 'top top',
-			end = 'bottom top',
-			onUpdate,
-			onEnter,
-			onLeave,
-			onEnterBack,
-			onLeaveBack
-		} = this.props;
+		const { trigger, start = 'top top', end = 'bottom top' } = this.props;
 
 		const rect = trigger.getBoundingClientRect();
 		const vh = window.innerHeight;
@@ -93,11 +109,22 @@ export class ScrollScrub {
 
 		const startOffset = parseOffset(start, elementHeight, vh);
 		const endOffset = parseOffset(end, elementHeight, vh);
-		const animationLength = elementTop + endOffset - (elementTop + startOffset);
 
-		if (animationLength <= 0) return;
+		this.scrollStart = elementTop + startOffset;
+		this.scrollEnd = elementTop + endOffset;
+		this.animationLength = this.scrollEnd - this.scrollStart;
 
-		const rawProgress = (window.scrollY - (elementTop + startOffset)) / animationLength;
+		this.update();
+	};
+
+	update = (): void => {
+		if (typeof window === 'undefined') return;
+
+		const { onUpdate, onEnter, onLeave, onEnterBack, onLeaveBack } = this.props;
+
+		if (this.animationLength <= 0) return;
+
+		const rawProgress = (window.scrollY - this.scrollStart) / this.animationLength;
 		const progress = Math.min(1, Math.max(0, rawProgress));
 
 		if (rawProgress >= 0 && this.lastProgress < 0) onEnter?.();
@@ -115,6 +142,12 @@ export class ScrollScrub {
 
 	destroy = (): void => {
 		scrollScrubTicker.unregister(this.tick);
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('resize', this.handleResize);
+		}
+		if (this.resizeTimeout !== null) {
+			clearTimeout(this.resizeTimeout);
+		}
 		if (this.observer) {
 			this.observer.disconnect();
 			this.observer = null;

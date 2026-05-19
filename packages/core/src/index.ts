@@ -43,17 +43,22 @@ export class ApfelSequenceEngine {
 	private prefersReducedMotion: PrefersReducedMotion | null = null;
 	private dpr: number = 1;
 	private resizeObserver: ResizeObserver | null = null;
+	private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 	private clearCacheOnBreakpointChange: boolean = false;
+	private isTouchDevice: boolean = false;
 	private emitter: Emitter;
 	constructor(config: ApfelSequenceProps) {
 		this.emitter = new Emitter();
 		this.config = config;
 		this.breakpoints = [];
+		this.isTouchDevice =
+			typeof window !== 'undefined' &&
+			window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 		this.prefersReducedMotion = new PrefersReducedMotion(this.emitter);
 		this.prefersReducedMotion.init();
 
-		this.emitter.subscribe('motionPreferenceChanged', (isReduced: boolean) => {
+		this.emitter.subscribe('motionPreferenceChanged', () => {
 			this.initFramesLoadings();
 		});
 
@@ -325,7 +330,16 @@ export class ApfelSequenceEngine {
 	};
 
 	resize = () => {
-		this.canvasRender.resizeCanvas();
+		if (this.isTouchDevice) {
+			if (this.resizeTimeout) {
+				clearTimeout(this.resizeTimeout);
+			}
+			this.resizeTimeout = setTimeout(() => {
+				this.canvasRender.resizeCanvas();
+			}, 150);
+		} else {
+			this.canvasRender.resizeCanvas();
+		}
 	};
 
 	destroy = () => {
@@ -336,6 +350,10 @@ export class ApfelSequenceEngine {
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
 			this.resizeObserver = null;
+		}
+
+		if (this.resizeTimeout) {
+			clearTimeout(this.resizeTimeout);
 		}
 
 		this.activeBreakpointManager?.destroy();
