@@ -112,8 +112,18 @@ export class ApfelSequenceEngine {
 						start: this.loadingConfig.start,
 						end: '100%',
 						onUpdate: () => {},
-						onEnter: async () => {
-							await this.frameLoaderManager?.preloadInitialFrames();
+						onEnter: () => {
+							this.frameLoaderManager?.preloadInitialFrames();
+
+							if (this.loadingConfig?.trigger && this.loadingConfig?.start) {
+								this.frameLoaderManager?.initLazyLoading(
+									this.loadingConfig.trigger,
+									this.loadingConfig.start,
+									'100%',
+									true
+								);
+							}
+
 							// One-shot: destroy after first fire
 							this.tlPreloadFirstChunk?.destroy();
 							this.tlPreloadFirstChunk = null;
@@ -121,12 +131,6 @@ export class ApfelSequenceEngine {
 					});
 					this.tlPreloadFirstChunk.init();
 				}
-				this.frameLoaderManager.initLazyLoading(
-					this.loadingConfig.trigger,
-					this.loadingConfig.start,
-					'100%',
-					true
-				);
 			} else {
 				await this.frameLoaderManager.preloadInitialFrames();
 			}

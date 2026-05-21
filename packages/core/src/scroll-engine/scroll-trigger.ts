@@ -43,6 +43,7 @@ export class ScrollScrub {
 	private props: ScrollScrubProps;
 	private observer: IntersectionObserver | null = null;
 	private lastProgress: number = -1;
+	private lastRawProgress: number | null = null;
 
 	private scrollStart: number = 0;
 	private scrollEnd: number = 0;
@@ -127,10 +128,19 @@ export class ScrollScrub {
 		const rawProgress = (window.scrollY - this.scrollStart) / this.animationLength;
 		const progress = Math.min(1, Math.max(0, rawProgress));
 
-		if (rawProgress >= 0 && this.lastProgress < 0) onEnter?.();
-		if (rawProgress >= 1 && this.lastProgress < 1) onLeave?.();
-		if (rawProgress < 1 && this.lastProgress >= 1) onEnterBack?.();
-		if (rawProgress < 0 && this.lastProgress >= 0) onLeaveBack?.();
+		if (this.lastRawProgress === null) {
+			const wasBefore = rawProgress >= 0;
+			const isPast = rawProgress >= 1;
+			if (wasBefore) onEnter?.();
+			if (isPast) onLeave?.();
+		} else {
+			if (rawProgress >= 0 && this.lastRawProgress < 0) onEnter?.();
+			if (rawProgress >= 1 && this.lastRawProgress < 1) onLeave?.();
+			if (rawProgress < 1 && this.lastRawProgress >= 1) onEnterBack?.();
+			if (rawProgress < 0 && this.lastRawProgress >= 0) onLeaveBack?.();
+		}
+
+		this.lastRawProgress = rawProgress;
 
 		if (progress !== this.lastProgress) {
 			this.lastProgress = progress;
