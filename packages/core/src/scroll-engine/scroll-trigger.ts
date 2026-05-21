@@ -134,9 +134,7 @@ export class ScrollScrub {
 
 		if (progress !== this.lastProgress) {
 			this.lastProgress = progress;
-			if (rawProgress >= 0 && rawProgress <= 1) {
-				onUpdate({ progress });
-			}
+			onUpdate({ progress });
 		}
 	};
 
