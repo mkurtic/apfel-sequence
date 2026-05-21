@@ -27,7 +27,7 @@ describe('scaleToContain / scaleToCover', () => {
 	});
 
 	it('scaleToContain should scale image to fit inside canvas', () => {
-		scaleToContain(img, canvas, ctx, 1);
+		scaleToContain(img, canvas, ctx);
 
 		const expectedScale = Math.min(canvas.width / img.width, canvas.height / img.height);
 		const expectedX = canvas.width / 2 - (img.width * expectedScale) / 2;
@@ -44,7 +44,7 @@ describe('scaleToContain / scaleToCover', () => {
 	});
 
 	it('scaleToCover should scale image to cover entire canvas', () => {
-		scaleToCover(img, canvas, ctx, 1);
+		scaleToCover(img, canvas, ctx);
 
 		const expectedScale = Math.max(canvas.width / img.width, canvas.height / img.height);
 		const expectedX = canvas.width / 2 - (img.width * expectedScale) / 2;
@@ -61,8 +61,8 @@ describe('scaleToContain / scaleToCover', () => {
 	});
 
 	it('should do nothing if img, canvas or ctx is missing', () => {
-		expect(() => scaleToContain(null as any, canvas, ctx, 1)).not.toThrow();
-		expect(() => scaleToCover(img, null as any, ctx, 1)).not.toThrow();
-		expect(() => scaleToCover(img, canvas, null as any, 1)).not.toThrow();
+		expect(() => scaleToContain(null as any, canvas, ctx)).not.toThrow();
+		expect(() => scaleToCover(img, null as any, ctx)).not.toThrow();
+		expect(() => scaleToCover(img, canvas, null as any)).not.toThrow();
 	});
 });
