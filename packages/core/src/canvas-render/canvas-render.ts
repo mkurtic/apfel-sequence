@@ -11,6 +11,8 @@ class CanvasRender {
 	private lastDrawnFrame: RenderableImage | null = null;
 	private lastDrawnFallback: RenderableImage | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
+	private containerWidth: number = 0;
+	private containerHeight: number = 0;
 	private emitter: ApfelEmitter;
 	constructor(config: {
 		emitter: ApfelEmitter;
@@ -26,12 +28,21 @@ class CanvasRender {
 		this.ctx = config.canvas.getContext('2d');
 		this.container = config.container;
 
+		this.updateContainerSize();
+		this.applySmoothing();
+
 		this.emitter.subscribe(
 			'drawFrame',
 			(frame: RenderableImage | null, fallback: RenderableImage | null | undefined) => {
 				this.drawFrame(frame, fallback);
 			}
 		);
+	}
+
+	private applySmoothing() {
+		if (!this.ctx) return;
+		this.ctx.imageSmoothingEnabled = true;
+		this.ctx.imageSmoothingQuality = 'high';
 	}
 
 	setDrawMode(drawMode: DrawMode | undefined) {
@@ -61,17 +72,15 @@ class CanvasRender {
 		const container = this.container;
 		if (!canvas || !ctx || !container) return;
 
-		ctx.imageSmoothingEnabled = true;
-		ctx.imageSmoothingQuality = 'high';
-
 		const dpr = this.dpr;
-		const width = container.clientWidth * dpr;
-		const height = container.clientHeight * dpr;
+		const width = this.containerWidth * dpr;
+		const height = this.containerHeight * dpr;
 
 		if (this.canvasSize.width !== width || this.canvasSize.height !== height) {
 			canvas.width = width;
 			canvas.height = height;
 			this.canvasSize = { width, height };
+			this.applySmoothing();
 		}
 
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -98,7 +107,15 @@ class CanvasRender {
 		}
 	};
 
-	resizeCanvas = () => this.drawFrame(null, undefined);
+	private updateContainerSize() {
+		this.containerWidth = this.container.clientWidth;
+		this.containerHeight = this.container.clientHeight;
+	}
+
+	resizeCanvas = () => {
+		this.updateContainerSize();
+		this.drawFrame(null, undefined);
+	};
 }
 
 export { CanvasRender };

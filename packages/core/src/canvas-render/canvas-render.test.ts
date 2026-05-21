@@ -117,8 +117,8 @@ describe('CanvasRender', () => {
 		// Change container size
 		Object.defineProperty(container, 'clientWidth', { configurable: true, value: 800 });
 
-		// Second draw
-		render.drawFrame(frame, null);
+		// Resize picks up new container dimensions
+		render.resizeCanvas();
 		expect(canvas.width).toBe(1600); // 800 * 2
 	});
 
