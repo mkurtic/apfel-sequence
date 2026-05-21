@@ -1,5 +1,11 @@
 # @apfel-sequence/core
 
+## 0.2.0
+
+### Minor Changes
+
+- Added progressive fallback image loading and noscript accessibility support
+
 ## 0.1.3
 
 ### Patch Changes
