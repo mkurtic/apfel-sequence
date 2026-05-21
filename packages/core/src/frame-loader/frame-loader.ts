@@ -4,13 +4,13 @@ import type {
 	FrameLoaderProps,
 	NetworkPolicy,
 	Frame,
-	RenderableImage
+	RenderableImage,
+	ApfelEmitter
 } from '../types/apfelSequence';
-import { Emitter } from '../utils/emitter/emitter';
 import { ScrollScrub } from '../scroll-engine/scroll-trigger';
 
 class FrameLoader {
-	private emitter: Emitter;
+	private emitter: ApfelEmitter;
 	private activeBreakpoint: BreakpointConfig;
 	private firstFrame: number;
 	private lastFrame: number;

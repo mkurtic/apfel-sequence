@@ -5,8 +5,8 @@ import type {
 	LoadingConfig,
 	ScrollConfig,
 	ApfelSequenceProps,
-	Frame,
-	DrawMode
+	ApfelSequenceEvents,
+	Frame
 } from './types/apfelSequence';
 export type {
 	AssetsConfig,
@@ -14,8 +14,9 @@ export type {
 	LoadingConfig,
 	ScrollConfig,
 	ApfelSequenceProps,
-	DrawMode
-};
+	DrawMode,
+	ApfelSequenceEvents
+} from './types/apfelSequence';
 import { ScrollEngine } from './scroll-engine/scroll-engine';
 import { ActiveBreakpoint } from './active-breakpoint/active-breakpoint';
 import resolveFallbackFrameUrl from './utils/url-resolvers/resolveFallbackUrls';
@@ -46,9 +47,9 @@ export class ApfelSequenceEngine {
 	private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 	private clearCacheOnBreakpointChange: boolean = false;
 	private isTouchDevice: boolean = false;
-	private emitter: Emitter;
+	private emitter: Emitter<ApfelSequenceEvents>;
 	constructor(config: ApfelSequenceProps) {
-		this.emitter = new Emitter();
+		this.emitter = new Emitter<ApfelSequenceEvents>();
 		this.config = config;
 		this.breakpoints = [];
 		this.isTouchDevice =
@@ -410,7 +411,11 @@ export class ApfelSequenceEngine {
 		const fallback = this.activeBreakpoint?.fallbackFrame;
 
 		if (!frame?.image && !fallback) return; // nothing to draw yet
-		this.emitter.emit('drawFrame', frame?.image || null, this.activeBreakpoint.fallbackFrame);
+		this.emitter.emit(
+			'drawFrame',
+			frame?.image || null,
+			this.activeBreakpoint.fallbackFrame ?? null
+		);
 	};
 
 	resize = () => {

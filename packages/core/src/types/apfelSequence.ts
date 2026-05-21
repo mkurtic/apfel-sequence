@@ -1,4 +1,4 @@
-import { Emitter } from '../utils/emitter/emitter';
+import type { Emitter } from '../utils/emitter/emitter';
 export type DrawMode = 'cover' | 'contain';
 export type NetworkPolicy = 'adaptive' | 'fallback-only';
 export type RenderableImage = HTMLImageElement | ImageBitmap;
@@ -14,6 +14,16 @@ export interface Frame {
 	attempts: number;
 	index: number;
 }
+
+export type ApfelSequenceEvents = {
+	drawFrame: [frame: RenderableImage | null, fallback: RenderableImage | null];
+	breakpointChanged: [breakpoint: BreakpointConfig];
+	frameLoaded: [frame: Frame];
+	frameFailed: [frame: Frame];
+	motionPreferenceChanged: [matches: boolean];
+};
+
+export type ApfelEmitter = Emitter<ApfelSequenceEvents>;
 
 export interface AssetConfig {
 	/** Unique name for the asset */
@@ -184,7 +194,7 @@ export interface BreakpointConfig {
 export type BreakpointsConfigs = BreakpointConfig[];
 
 export interface FrameLoaderProps {
-	emitter: Emitter;
+	emitter: ApfelEmitter;
 	activeBreakpoint: BreakpointConfig;
 	firstFrame: number;
 	lastFrame: number;

@@ -1,11 +1,11 @@
-import type { Emitter } from '../utils/emitter/emitter';
+import type { ApfelEmitter } from '../types/apfelSequence';
 
 export class PrefersReducedMotion {
 	private mediaQuery: MediaQueryList | null = null;
 	private listener?: (event: MediaQueryListEvent) => void;
-	private emitter: Emitter;
+	private emitter: ApfelEmitter;
 
-	constructor(emitter: Emitter) {
+	constructor(emitter: ApfelEmitter) {
 		this.emitter = emitter;
 		if (typeof window === 'undefined') return;
 

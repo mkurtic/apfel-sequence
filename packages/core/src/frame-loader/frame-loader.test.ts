@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { FrameLoader } from './frame-loader';
 import type { BreakpointConfig } from '../types/apfelSequence';
 import { Emitter } from '../utils/emitter/emitter';
+import type { ApfelSequenceEvents } from '../types/apfelSequence';
 
 const mockScrollScrubInstances: any[] = [];
 vi.mock('../scroll-engine/scroll-trigger', () => ({
@@ -56,7 +57,7 @@ describe('FrameLoader', () => {
 	describe('Sequential Loading Mode', () => {
 		beforeEach(() => {
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -104,7 +105,7 @@ describe('FrameLoader', () => {
 			});
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -132,7 +133,7 @@ describe('FrameLoader', () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -159,7 +160,7 @@ describe('FrameLoader', () => {
 	describe('Parallel Loading Mode', () => {
 		beforeEach(() => {
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -202,7 +203,7 @@ describe('FrameLoader', () => {
 			// Reset
 			mockBreakpoint.frames = new Array(10).fill(null);
 			const sequentialLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -231,7 +232,7 @@ describe('FrameLoader', () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -257,7 +258,7 @@ describe('FrameLoader', () => {
 			const onFrameLoaded = vi.fn();
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -297,7 +298,7 @@ describe('FrameLoader', () => {
 			vi.useRealTimers();
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -347,7 +348,7 @@ describe('FrameLoader', () => {
 			} as any;
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -406,7 +407,7 @@ describe('FrameLoader', () => {
 			} as any;
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -440,7 +441,7 @@ describe('FrameLoader', () => {
 			mockScrollScrubInstances.length = 0;
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -471,7 +472,7 @@ describe('FrameLoader', () => {
 	describe('Preloading', () => {
 		it('should preload the specified number of frames', async () => {
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,
@@ -516,7 +517,7 @@ describe('FrameLoader', () => {
 			} as any;
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 50,
@@ -526,7 +527,7 @@ describe('FrameLoader', () => {
 				maxConcurrency: 5 // Enforce 5
 			});
 
-			const startTime = Date.now();
+			const _startTime = Date.now();
 
 			const promises = [];
 			for (let i = 1; i <= 20; i++) {
@@ -545,7 +546,7 @@ describe('FrameLoader', () => {
 			const loadOrder: number[] = [];
 
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 100,
@@ -556,7 +557,7 @@ describe('FrameLoader', () => {
 			});
 
 			// We need a way to spy on which frame is loading when
-			const spy = vi
+			const _spy = vi
 				.spyOn(frameLoader as any, 'executeNetworkFetch')
 				.mockImplementation(async (frameNum: any) => {
 					loadOrder.push(frameNum);
@@ -582,7 +583,7 @@ describe('FrameLoader', () => {
 	describe('Garbage Collection & Pre-flight Queue Trimming', () => {
 		it('should reject and clear out-of-bounds frames from the queue without fetching them', async () => {
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: {
 					...mockBreakpoint,
 					frameLastId: 200,
@@ -597,8 +598,8 @@ describe('FrameLoader', () => {
 			});
 
 			// Queue 10 frames sequentially (1-10) using loadFrame behind the scenes
-			const p1 = frameLoader.loadFrame(1, 'parallel').catch(() => {});
-			const p2 = frameLoader.loadFrame(2, 'parallel').catch(() => {});
+			const _p1 = frameLoader.loadFrame(1, 'parallel').catch(() => {});
+			const _p2 = frameLoader.loadFrame(2, 'parallel').catch(() => {});
 			const p99 = frameLoader.loadFrame(99, 'parallel'); // this will wait in queue
 
 			let rejects = 0;
@@ -618,7 +619,7 @@ describe('FrameLoader', () => {
 
 		it('should cleanly drop internal Map references (abortControllers, activeRequests) on destroy', async () => {
 			frameLoader = new FrameLoader({
-				emitter: new Emitter(),
+				emitter: new Emitter<ApfelSequenceEvents>(),
 				activeBreakpoint: mockBreakpoint,
 				firstFrame: 1,
 				lastFrame: 10,

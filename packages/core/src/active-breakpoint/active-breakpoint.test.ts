@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ActiveBreakpoint } from './active-breakpoint';
 import { Emitter } from '../utils/emitter/emitter';
+import type { ApfelSequenceEvents } from '../types/apfelSequence';
 import type { BreakpointConfig } from '../types/apfelSequence';
 
 describe('ActiveBreakpoint', () => {
@@ -40,7 +41,7 @@ describe('ActiveBreakpoint', () => {
 	});
 
 	it('should throw error if breakpoints array is empty', () => {
-		expect(() => new ActiveBreakpoint([], new Emitter())).toThrow(
+		expect(() => new ActiveBreakpoint([], new Emitter<ApfelSequenceEvents>())).toThrow(
 			'ActiveBreakpoint requires at least one breakpoint'
 		);
 	});
@@ -57,24 +58,24 @@ describe('ActiveBreakpoint', () => {
 				url: ''
 			}
 		];
-		expect(() => new ActiveBreakpoint(overlappingBreakpoints, new Emitter())).toThrow(
-			'Breakpoints overlap'
-		);
+		expect(
+			() => new ActiveBreakpoint(overlappingBreakpoints, new Emitter<ApfelSequenceEvents>())
+		).toThrow('Breakpoints overlap');
 	});
 
 	it('should initialize with the correct breakpoint based on window width', () => {
 		vi.stubGlobal('innerWidth', 500);
-		const manager = new ActiveBreakpoint(breakpoints, new Emitter());
+		const manager = new ActiveBreakpoint(breakpoints, new Emitter<ApfelSequenceEvents>());
 		manager.init();
 		expect(manager.getActive().name).toBe('mobile');
 
 		vi.stubGlobal('innerWidth', 800);
-		const manager2 = new ActiveBreakpoint(breakpoints, new Emitter());
+		const manager2 = new ActiveBreakpoint(breakpoints, new Emitter<ApfelSequenceEvents>());
 		manager2.init();
 		expect(manager2.getActive().name).toBe('tablet');
 
 		vi.stubGlobal('innerWidth', 1200);
-		const manager3 = new ActiveBreakpoint(breakpoints, new Emitter());
+		const manager3 = new ActiveBreakpoint(breakpoints, new Emitter<ApfelSequenceEvents>());
 		manager3.init();
 		expect(manager3.getActive().name).toBe('desktop');
 	});
@@ -94,7 +95,7 @@ describe('ActiveBreakpoint', () => {
 		];
 
 		vi.stubGlobal('innerWidth', 550); // In the gap
-		const manager = new ActiveBreakpoint(gapBreakpoints, new Emitter());
+		const manager = new ActiveBreakpoint(gapBreakpoints, new Emitter<ApfelSequenceEvents>());
 		// Should throw error
 		expect(() => manager.init()).toThrow('No breakpoint found for width 550');
 	});
@@ -102,7 +103,7 @@ describe('ActiveBreakpoint', () => {
 	it('should update active breakpoint on window resize', () => {
 		vi.useFakeTimers();
 		vi.stubGlobal('innerWidth', 500);
-		const manager = new ActiveBreakpoint(breakpoints, new Emitter());
+		const manager = new ActiveBreakpoint(breakpoints, new Emitter<ApfelSequenceEvents>());
 		manager.init();
 		expect(manager.getActive().name).toBe('mobile');
 
@@ -119,7 +120,7 @@ describe('ActiveBreakpoint', () => {
 	it('should notify subscribers when breakpoint changes', () => {
 		vi.useFakeTimers();
 		vi.stubGlobal('innerWidth', 500);
-		const emitter = new Emitter();
+		const emitter = new Emitter<ApfelSequenceEvents>();
 		const emitSpy = vi.spyOn(emitter, 'emit');
 		const manager = new ActiveBreakpoint(breakpoints, emitter);
 		manager.init();
@@ -145,7 +146,7 @@ describe('ActiveBreakpoint', () => {
 	it('should debounce resize events', () => {
 		vi.useFakeTimers();
 		vi.stubGlobal('innerWidth', 500);
-		const emitter = new Emitter();
+		const emitter = new Emitter<ApfelSequenceEvents>();
 		const emitSpy = vi.spyOn(emitter, 'emit');
 		const manager = new ActiveBreakpoint(breakpoints, emitter);
 		manager.init();
@@ -178,7 +179,7 @@ describe('ActiveBreakpoint', () => {
 	it("should NOT notify subscribers if resize doesn't change active breakpoint", () => {
 		vi.useFakeTimers();
 		vi.stubGlobal('innerWidth', 500);
-		const emitter = new Emitter();
+		const emitter = new Emitter<ApfelSequenceEvents>();
 		const emitSpy = vi.spyOn(emitter, 'emit');
 		const manager = new ActiveBreakpoint(breakpoints, emitter);
 		manager.init();
@@ -198,7 +199,7 @@ describe('ActiveBreakpoint', () => {
 	});
 
 	it('should clean up listeners on destroy', () => {
-		const manager = new ActiveBreakpoint(breakpoints, new Emitter());
+		const manager = new ActiveBreakpoint(breakpoints, new Emitter<ApfelSequenceEvents>());
 		manager.init();
 
 		const removeSpy = vi.spyOn(window, 'removeEventListener');

@@ -1,26 +1,32 @@
-export class Emitter {
-	private events: { [key: string]: Function[] } = {};
+type Listener<Args extends unknown[]> = (...args: Args) => void;
 
-	subscribe(name: string, cb: Function) {
-		if (!this.events[name]) {
-			this.events[name] = [];
-		}
-		this.events[name].push(cb);
-	}
+export class Emitter<T extends Record<string, unknown[]>> {
+	private events: { [K in keyof T]?: Listener<T[K]>[] } = {};
 
-	unsubscribe(name: string, cb: Function) {
-		if (this.events[name]) {
-			this.events[name] = this.events[name].filter((fn) => fn !== cb);
+	subscribe<K extends keyof T>(name: K, cb: Listener<T[K]>): void {
+		const list = this.events[name];
+		if (!list) {
+			this.events[name] = [cb];
+		} else {
+			list.push(cb);
 		}
 	}
 
-	emit(name: string, ...args: any[]) {
-		if (this.events[name]) {
-			this.events[name].forEach((cb) => cb(...args));
+	unsubscribe<K extends keyof T>(name: K, cb: Listener<T[K]>): void {
+		const list = this.events[name];
+		if (list) {
+			this.events[name] = list.filter((fn) => fn !== cb);
 		}
 	}
 
-	destroy() {
+	emit<K extends keyof T>(name: K, ...args: T[K]): void {
+		const list = this.events[name];
+		if (list) {
+			list.forEach((cb) => cb(...args));
+		}
+	}
+
+	destroy(): void {
 		this.events = {};
 	}
 }

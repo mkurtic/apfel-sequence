@@ -1,13 +1,12 @@
-import type { BreakpointConfig } from '../types/apfelSequence';
-import type { Emitter } from '../utils/emitter/emitter';
+import type { BreakpointConfig, ApfelEmitter } from '../types/apfelSequence';
 
 export class ActiveBreakpoint<T extends BreakpointConfig> {
 	private breakpoints: T[];
 	private active: T;
 	private resizeHandler: () => void;
-	private emitter: Emitter;
+	private emitter: ApfelEmitter;
 
-	constructor(breakpoints: T[], emitter: Emitter) {
+	constructor(breakpoints: T[], emitter: ApfelEmitter) {
 		this.emitter = emitter;
 		if (breakpoints.length === 0) {
 			throw new Error('ActiveBreakpoint requires at least one breakpoint');

@@ -1,7 +1,6 @@
-import type { DrawMode, RenderableImage } from '../types/apfelSequence';
+import type { DrawMode, RenderableImage, ApfelEmitter } from '../types/apfelSequence';
 import { scaleToCover } from '../utils/canvas/scaleToCover';
 import { scaleToContain } from '../utils/canvas/scaleToContain';
-import type { Emitter } from '../utils/emitter/emitter';
 
 class CanvasRender {
 	private dpr: number;
@@ -12,9 +11,9 @@ class CanvasRender {
 	private lastDrawnFrame: RenderableImage | null = null;
 	private lastDrawnFallback: RenderableImage | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
-	private emitter: Emitter;
+	private emitter: ApfelEmitter;
 	constructor(config: {
-		emitter: Emitter;
+		emitter: ApfelEmitter;
 		canvas: HTMLCanvasElement;
 		container: HTMLElement;
 		dpr: number;
