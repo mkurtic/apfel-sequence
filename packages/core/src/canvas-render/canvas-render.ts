@@ -10,6 +10,7 @@ class CanvasRender {
 	private ctx: CanvasRenderingContext2D | null;
 	private container: HTMLElement;
 	private lastDrawnFrame: RenderableImage | null = null;
+	private lastDrawnFallback: RenderableImage | null = null;
 	private canvasSize: { width: number; height: number } = { width: 0, height: 0 };
 	private emitter: Emitter;
 	constructor(config: {
@@ -37,7 +38,9 @@ class CanvasRender {
 	setDrawMode(drawMode: DrawMode | undefined) {
 		this.drawMode = drawMode;
 		if (this.lastDrawnFrame) {
-			this.drawFrame(this.lastDrawnFrame, null);
+			this.drawFrame(this.lastDrawnFrame, this.lastDrawnFallback);
+		} else if (this.lastDrawnFallback) {
+			this.drawFrame(null, this.lastDrawnFallback);
 		}
 	}
 
@@ -74,6 +77,10 @@ class CanvasRender {
 
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 
+		if (fallback !== undefined) {
+			this.lastDrawnFallback = fallback;
+		}
+
 		//only fallback BEFORE first real frame
 		if (frame) {
 			this.lastDrawnFrame = frame;
@@ -81,8 +88,8 @@ class CanvasRender {
 			return;
 		}
 
-		if (!this.lastDrawnFrame && fallback) {
-			this.renderImage(fallback, canvas, ctx);
+		if (!this.lastDrawnFrame && this.lastDrawnFallback) {
+			this.renderImage(this.lastDrawnFallback, canvas, ctx);
 			return;
 		}
 
@@ -92,7 +99,7 @@ class CanvasRender {
 		}
 	};
 
-	resizeCanvas = () => this.drawFrame(null, null);
+	resizeCanvas = () => this.drawFrame(null, undefined);
 }
 
 export { CanvasRender };

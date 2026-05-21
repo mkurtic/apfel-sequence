@@ -1,6 +1,17 @@
 <template>
 	<div class="apfel-container" ref="containerRef">
 		<canvas class="apfel-sequence" ref="canvasRef" role="img" :aria-label="props.alt"></canvas>
+		<noscript v-if="props.fallbackSrc">
+			<img
+				:src="props.fallbackSrc"
+				:alt="props.alt"
+				:style="{
+					width: '100%',
+					height: '100%',
+					objectFit: props.drawMode === 'contain' ? 'contain' : 'cover'
+				}"
+			/>
+		</noscript>
 	</div>
 </template>
 
@@ -9,7 +20,9 @@ import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { ApfelSequenceEngine } from '@apfel-sequence/core';
 import type { ApfelSequenceProps } from '@apfel-sequence/core';
 
-export type ApfelSequenceVueProps = Omit<ApfelSequenceProps, 'canvas' | 'container'>;
+export type ApfelSequenceVueProps = Omit<ApfelSequenceProps, 'canvas' | 'container'> & {
+	fallbackSrc?: string;
+};
 
 const props = defineProps<ApfelSequenceVueProps>();
 let apfelSequence: ApfelSequenceEngine;

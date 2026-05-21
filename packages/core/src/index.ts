@@ -283,11 +283,40 @@ export class ApfelSequenceEngine {
 		});
 	};
 
+	private loadFallbackFrame = async (breakpoint: BreakpointConfig) => {
+		if (breakpoint.fallbackFrame || !breakpoint.fallbackFrameUrl) return;
+
+		return new Promise<void>((resolve) => {
+			const img = new Image();
+			img.onload = () => {
+				breakpoint.fallbackFrame = img;
+				if (this.activeBreakpoint?.name === breakpoint.name) {
+					this.emitter.emit(
+						'drawFrame',
+						this.activeBreakpoint.frames[0]?.image || null,
+						breakpoint.fallbackFrame
+					);
+				}
+				resolve();
+			};
+			img.onerror = (err) => {
+				console.warn(
+					`ApfelSequence: Failed to load fallback frame at ${breakpoint.fallbackFrameUrl}`,
+					err
+				);
+				resolve();
+			};
+			img.src = breakpoint.fallbackFrameUrl as string;
+		});
+	};
+
 	private handleBreakpointChanged = async (breakpoint: BreakpointConfig) => {
 		this.activeBreakpoint = breakpoint;
 
 		this.normalizeFramesRange(this.activeBreakpoint);
 		this.initFramesLoadingManager();
+
+		await this.loadFallbackFrame(this.activeBreakpoint);
 		await this.initFramesLoadings();
 
 		if (this.clearCacheOnBreakpointChange) {

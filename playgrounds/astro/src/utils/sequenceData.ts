@@ -40,6 +40,7 @@ export const section2Assets: AssetsConfig = [
 	{
 		name: 'desktop',
 		url: '/images/sequences/snow/desktop/snow_',
+		frameFallback: '/images/sequences/snow/desktop/snow_0100.webp',
 		frameFirstId: 1,
 		frameLastId: 242,
 		frameSuffix: '.webp',
@@ -49,6 +50,7 @@ export const section2Assets: AssetsConfig = [
 	{
 		name: 'tablet',
 		url: '/images/sequences/snow/tablet/snow_',
+		frameFallback: '/images/sequences/snow/tablet/snow_0100.webp',
 		frameFirstId: 1,
 		frameLastId: 242,
 		frameSuffix: '.webp',
@@ -58,6 +60,7 @@ export const section2Assets: AssetsConfig = [
 	{
 		name: 'mobile',
 		url: '/images/sequences/snow/mobile/snow_',
+		frameFallback: '/images/sequences/snow/mobile/snow_0100.webp',
 		frameFirstId: 1,
 		frameLastId: 242,
 		frameSuffix: '.webp',

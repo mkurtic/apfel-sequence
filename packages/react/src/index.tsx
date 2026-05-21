@@ -3,7 +3,9 @@ import { useEffect, useRef, useMemo } from 'react';
 import { ApfelSequenceEngine } from '@apfel-sequence/core';
 import type { ApfelSequenceProps } from '@apfel-sequence/core';
 
-export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, 'canvas' | 'container'>;
+export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, 'canvas' | 'container'> & {
+	fallbackSrc?: string;
+};
 
 const ApfelSequence = (props: ApfelSequenceReactProps) => {
 	const {
@@ -13,7 +15,8 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 		scrollConfig,
 		loadingConfig,
 		clearCacheOnBreakpointChange,
-		alt
+		alt,
+		fallbackSrc
 	} = props;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -98,7 +101,19 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 	return (
 		<div className="apfel-container" ref={containerRef}>
 			<canvas className="apfel-sequence" ref={canvasRef} aria-label={alt} role="img" />
-			{/*Fallback only img tag*/}
+			{fallbackSrc && (
+				<noscript>
+					<img
+						src={fallbackSrc}
+						alt={alt}
+						style={{
+							width: '100%',
+							height: '100%',
+							objectFit: drawMode === 'contain' ? 'contain' : 'cover'
+						}}
+					/>
+				</noscript>
+			)}
 		</div>
 	);
 };
