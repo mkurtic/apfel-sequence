@@ -1,15 +1,17 @@
 main {
 	background: #fefefe;
 }
+
 section {
 	min-width: 100vw;
 	min-height: 100vh;
+	min-height: 100svh;
 }
 
 .apfel-container {
 	width: 100vw;
 	height: 100vh;
-	height: 100dvh;
+	height: 100svh;
 }
 
 .apfel-sequence {
