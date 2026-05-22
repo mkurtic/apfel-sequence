@@ -37,6 +37,9 @@ export class ScrollEngine {
 					this.lastFrame = frameIndex;
 					onFrameChange(frameIndex);
 				}
+				if (this.props.lazyLoadAroundFrame) {
+					this.props.lazyLoadAroundFrame(frameIndex);
+				}
 			}
 		});
 

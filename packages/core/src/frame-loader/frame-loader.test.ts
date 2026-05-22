@@ -4,16 +4,6 @@ import type { BreakpointConfig } from '../types/apfelSequence';
 import { Emitter } from '../utils/emitter/emitter';
 import type { ApfelSequenceEvents } from '../types/apfelSequence';
 
-const mockScrollScrubInstances: any[] = [];
-vi.mock('../scroll-engine/scroll-trigger', () => ({
-	ScrollScrub: vi.fn().mockImplementation(function (this: any, props: any) {
-		this.init = vi.fn();
-		this.destroy = vi.fn();
-		this._props = props;
-		mockScrollScrubInstances.push(this);
-	})
-}));
-
 describe('FrameLoader', () => {
 	let mockBreakpoint: BreakpointConfig;
 	let frameLoader: FrameLoader;
@@ -431,41 +421,6 @@ describe('FrameLoader', () => {
 			expect(attempts).toBeGreaterThanOrEqual(2);
 			expect(mockBreakpoint.frames[0]?.status).toBe('success');
 			expect(mockBreakpoint.frames[0]?.attempts).toBeGreaterThanOrEqual(2);
-		});
-	});
-
-	describe('Lazy Loading', () => {
-		it('should init ScrollScrub and load neighbors on update', async () => {
-			const { ScrollScrub } = await import('../scroll-engine/scroll-trigger');
-			// Clear any instances from previous tests
-			mockScrollScrubInstances.length = 0;
-
-			frameLoader = new FrameLoader({
-				emitter: new Emitter<ApfelSequenceEvents>(),
-				activeBreakpoint: mockBreakpoint,
-				firstFrame: 1,
-				lastFrame: 10,
-				preloadCount: 0,
-				maxRetries: 1,
-				retryDelay: 0
-			});
-
-			const loadFrameSpy = vi.spyOn(frameLoader, 'loadFrame');
-
-			// Create a fake trigger element
-			const triggerEl = document.createElement('div');
-			frameLoader.initLazyLoading(triggerEl);
-
-			// ScrollScrub should have been instantiated
-			expect(ScrollScrub).toHaveBeenCalled();
-			expect(mockScrollScrubInstances.length).toBeGreaterThan(0);
-
-			// Get the instance and simulate a scroll update at 50%
-			const instance = mockScrollScrubInstances[mockScrollScrubInstances.length - 1];
-			instance._props.onUpdate({ progress: 0.5 });
-
-			// Should trigger loadFrame for neighbors
-			expect(loadFrameSpy).toHaveBeenCalled();
 		});
 	});
 

@@ -48,6 +48,7 @@ export class ApfelSequenceEngine {
 	private clearCacheOnBreakpointChange: boolean = false;
 	private isTouchDevice: boolean = false;
 	private emitter: Emitter<ApfelSequenceEvents>;
+	private isLazyLoadingTriggered: boolean = false;
 	constructor(config: ApfelSequenceProps) {
 		this.emitter = new Emitter<ApfelSequenceEvents>();
 		this.config = config;
@@ -99,6 +100,7 @@ export class ApfelSequenceEngine {
 
 		if (this.loadingConfig?.loadingMode === 'lazy' && !fallbackOnly) {
 			if (this.loadingConfig.trigger) {
+				this.isLazyLoadingTriggered = false;
 				if (this.tlPreloadFirstChunk) {
 					this.tlPreloadFirstChunk.destroy();
 				}
@@ -113,16 +115,8 @@ export class ApfelSequenceEngine {
 						end: '100%',
 						onUpdate: () => {},
 						onEnter: () => {
+							this.isLazyLoadingTriggered = true;
 							this.frameLoaderManager?.preloadInitialFrames();
-
-							if (this.loadingConfig?.trigger && this.loadingConfig?.start) {
-								this.frameLoaderManager?.initLazyLoading(
-									this.loadingConfig.trigger,
-									this.loadingConfig.start,
-									'100%',
-									true
-								);
-							}
 
 							// One-shot: destroy after first fire
 							this.tlPreloadFirstChunk?.destroy();
@@ -158,7 +152,13 @@ export class ApfelSequenceEngine {
 			end: this.scrollConfig.end,
 			markers: this.scrollConfig.markers,
 			loadingMode: this.loadingConfig.loadingMode,
-			lazyLoadAroundFrame: fallbackOnly ? undefined : () => {}
+			lazyLoadAroundFrame: fallbackOnly
+				? undefined
+				: (frameIndex) => {
+						if (this.isLazyLoadingTriggered || this.loadingConfig?.loadingMode === 'eager') {
+							this.frameLoaderManager?.lazyLoadAroundFrame(frameIndex);
+						}
+				  }
 		});
 
 		this.resizeObserver = new ResizeObserver(() => {
@@ -251,7 +251,7 @@ export class ApfelSequenceEngine {
 		};
 	};
 
-	PRELOAD_RATIO = 1 / 3;
+	PRELOAD_RATIO = 1 / 10;
 
 	normalizeLoadingConfig = (loadingConfig?: LoadingConfig): LoadingConfig => {
 		const normalizedTrigger =
@@ -260,12 +260,12 @@ export class ApfelSequenceEngine {
 				: this.config.container;
 		return {
 			loadingMode: loadingConfig?.loadingMode ?? 'lazy',
-			preloadCount: Math.min(
+			preloadCount: Math.max(
 				this.minFramesToPreload,
 				Math.ceil((this.lastFrame - this.firstFrame) * this.PRELOAD_RATIO)
 			),
 			trigger: normalizedTrigger,
-			start: loadingConfig?.start ?? 'top top',
+			start: loadingConfig?.start ?? 'top bottom',
 			markers: loadingConfig?.markers ?? false,
 			maxRetries: loadingConfig?.maxRetries ?? 3,
 			retryDelay: loadingConfig?.retryDelay ?? 200
@@ -319,6 +319,7 @@ export class ApfelSequenceEngine {
 		this.activeBreakpoint = breakpoint;
 
 		this.normalizeFramesRange(this.activeBreakpoint);
+		this.loadingConfig = this.normalizeLoadingConfig(this.config.loadingConfig);
 		this.initFramesLoadingManager();
 
 		await this.loadFallbackFrame(this.activeBreakpoint);
@@ -396,7 +397,13 @@ export class ApfelSequenceEngine {
 				end: this.scrollConfig.end,
 				markers: this.scrollConfig.markers,
 				loadingMode: this.loadingConfig?.loadingMode,
-				lazyLoadAroundFrame: fallbackOnly ? undefined : () => {}
+				lazyLoadAroundFrame: fallbackOnly
+					? undefined
+					: (frameIndex) => {
+							if (this.isLazyLoadingTriggered || this.loadingConfig?.loadingMode === 'eager') {
+								this.frameLoaderManager?.lazyLoadAroundFrame(frameIndex);
+							}
+					  }
 			});
 		}
 

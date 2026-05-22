@@ -70,7 +70,7 @@ export const section2Assets: AssetsConfig = [
 ];
 
 export const section2LoadingConfig: LoadingConfig = {
-	trigger: '#section-2',
+	trigger: '#spacer',
 	start: 'top top',
 	markers: false
 };

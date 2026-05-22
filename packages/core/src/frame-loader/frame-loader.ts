@@ -7,7 +7,6 @@ import type {
 	RenderableImage,
 	ApfelEmitter
 } from '../types/apfelSequence';
-import { ScrollScrub } from '../scroll-engine/scroll-trigger';
 
 class FrameLoader {
 	private emitter: ApfelEmitter;
@@ -18,7 +17,7 @@ class FrameLoader {
 	private networkPolicy: NetworkPolicy | undefined;
 	private activeRequests = new Map<number, Promise<void>>();
 	private abortControllers = new Map<number, AbortController>();
-	private lazyLoadingTL: ScrollScrub | null = null;
+
 	private maxRetries: number;
 	private retryDelay: number;
 	private maxConcurrency: number;
@@ -340,33 +339,6 @@ class FrameLoader {
 		}
 	}
 
-	initLazyLoading = (
-		trigger: HTMLElement | string,
-		start: string = 'top top',
-		end: string = '100%',
-		scrub: boolean = true
-	): void => {
-		const totalFrames = this.lastFrame - this.firstFrame + 1;
-		const triggerEl =
-			typeof trigger === 'string' ? document.querySelector<HTMLElement>(trigger) : trigger;
-		if (!triggerEl) return;
-
-		this.lazyLoadingTL?.destroy();
-		this.lazyLoadingTL = new ScrollScrub({
-			trigger: triggerEl,
-			start,
-			end,
-			scrub,
-			onUpdate: ({ progress }) => {
-				const frameIndex = Math.floor(progress * (totalFrames - 1));
-				if (this.lazyLoadAroundFrame) {
-					this.lazyLoadAroundFrame(frameIndex);
-				}
-			}
-		});
-		this.lazyLoadingTL.init();
-	};
-
 	async preloadInitialFrames(): Promise<void> {
 		const totalFrames = this.lastFrame - this.firstFrame + 1;
 		const framesToPreload = Math.min(this.preloadCount, totalFrames);
@@ -377,10 +349,6 @@ class FrameLoader {
 	}
 
 	destroy(): void {
-		if (this.lazyLoadingTL) {
-			this.lazyLoadingTL.destroy();
-			this.lazyLoadingTL = null;
-		}
 		for (const controller of this.abortControllers.values()) {
 			controller.abort();
 		}
