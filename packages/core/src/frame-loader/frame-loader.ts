@@ -292,7 +292,11 @@ class FrameLoader {
 		const totalFrames = this.lastFrame - this.firstFrame + 1;
 
 		for (let i = 0; i < totalFrames; i++) {
-			await this.loadFrame(this.firstFrame + i);
+			this.loadFrame(this.firstFrame + i, 'sequential').catch((err) => {
+				if (err instanceof Error && err.name !== 'AbortError') {
+					console.error('ApfelSequence:', err);
+				}
+			});
 		}
 	}
 
