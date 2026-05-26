@@ -89,6 +89,9 @@ export interface LoadingConfig {
  * ScrollTrigger-related configuration for the scroll sequence.
  */
 export interface ScrollConfig {
+	/** CSS selector or element to trigger scroll (defaults to container) */
+	trigger?: HTMLElement | string;
+
 	/** Show ScrollTrigger markers for debugging */
 	markers?: boolean;
 
@@ -208,6 +211,7 @@ export interface FrameLoaderProps {
 
 export interface ScrollEngineProps {
 	containerRef: HTMLElement;
+	triggerRef?: HTMLElement;
 	totalFrames: number;
 	onFrameChange: (frameIndex: number) => void;
 	scrub?: boolean;

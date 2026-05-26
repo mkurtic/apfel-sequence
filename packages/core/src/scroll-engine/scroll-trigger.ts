@@ -20,7 +20,7 @@ export type ScrollScrubProps = {
 	onLeaveBack?: () => void;
 };
 
-function parseOffset(
+export function parseOffset(
 	positionStr: string = 'top top',
 	elementSize: number,
 	viewportSize: number

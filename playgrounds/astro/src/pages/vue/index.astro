@@ -1,13 +1,14 @@
 ---
 import ApfelSequence from '@apfel-sequence/vue';
 import Layout from '../../layouts/Layout.astro';
-import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig, commonDrawMode } from "./../../utils/sequenceData"
+import { heroAssets,heroScrollConfig, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig, commonDrawMode } from "./../../utils/sequenceData"
 ---
 <Layout>
 	<section id="hero">
 		<ApfelSequence 
 			client:only="vue" 
 			assetsConfig={heroAssets}
+			scrollConfig={heroScrollConfig}
 			loadingConfig={heroLoadingConfig}
 			alt={"My hero alt text"} 
 			drawMode={commonDrawMode}

@@ -32,6 +32,12 @@ export const heroAssets: AssetsConfig = [
 	}
 ];
 
+export const heroScrollConfig: ScrollConfig = {
+	trigger: '#hero',
+	start: 'top top',
+	end: 'bottom bottom'
+};
+
 export const heroLoadingConfig: LoadingConfig = {
 	loadingMode: 'eager'
 };
@@ -76,6 +82,7 @@ export const section2LoadingConfig: LoadingConfig = {
 };
 
 export const section2ScrollConfig: ScrollConfig = {
+	trigger: '#section-2',
 	start: 'top top',
-	end: '100%'
+	end: 'bottom bottom'
 };

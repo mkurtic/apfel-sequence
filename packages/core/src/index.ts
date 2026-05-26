@@ -143,8 +143,14 @@ export class ApfelSequenceEngine {
 		this.scrollConfig = this.normalizeScrollConfig(config.scrollConfig);
 		this.loadingConfig = this.normalizeLoadingConfig(config.loadingConfig);
 
+		const scrollTriggerEl =
+			typeof this.scrollConfig.trigger === 'string'
+				? document.querySelector<HTMLElement>(this.scrollConfig.trigger) || config.container
+				: this.scrollConfig.trigger || config.container;
+
 		this.scrollEngine = new ScrollEngine({
 			containerRef: config.container,
+			triggerRef: scrollTriggerEl,
 			totalFrames: fallbackOnly ? 1 : this.totalFrames,
 			onFrameChange: fallbackOnly ? () => {} : this.handleFrameChange,
 			scrub: this.scrollConfig.scrub,
@@ -243,7 +249,12 @@ export class ApfelSequenceEngine {
 	};
 
 	normalizeScrollConfig = (scrollConfig?: ScrollConfig): ScrollConfig => {
+		const normalizedTrigger =
+			typeof scrollConfig?.trigger === 'string' && scrollConfig.trigger.trim() !== ''
+				? scrollConfig.trigger
+				: scrollConfig?.trigger || this.config.container;
 		return {
+			trigger: normalizedTrigger,
 			markers: scrollConfig?.markers ?? false,
 			scrub: scrollConfig?.scrub ?? true,
 			start: scrollConfig?.start ?? 'top top',
@@ -386,10 +397,17 @@ export class ApfelSequenceEngine {
 		) {
 			this.scrollEngine?.destroy();
 			this.scrollConfig = this.normalizeScrollConfig(this.config.scrollConfig);
+
+			const scrollTriggerEl =
+				typeof this.scrollConfig.trigger === 'string'
+					? document.querySelector<HTMLElement>(this.scrollConfig.trigger) || this.config.container
+					: this.scrollConfig.trigger || this.config.container;
+
 			const fallbackOnly =
 				this.config.networkPolicy === 'fallback-only' || this.prefersReducedMotion?.value;
 			this.scrollEngine = new ScrollEngine({
 				containerRef: this.config.container,
+				triggerRef: scrollTriggerEl,
 				totalFrames: fallbackOnly ? 1 : this.totalFrames,
 				onFrameChange: fallbackOnly ? () => {} : this.handleFrameChange,
 				scrub: this.scrollConfig.scrub,

@@ -2,30 +2,42 @@
 import Layout from "../layouts/Layout.astro";
 ---
 <Layout>
-  <section id="hero">
-		<div id="canvas-container" class="apfel-container">
+  <section id="hero" class="sequence-section">
+		<div id="canvas-container" class="apfel-container sticky-container">
   		<canvas class="apfel-sequence" id="canvas"></canvas>
     </div>
   </section>
   <section id="spacer" style="height: 100vh; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
     <h2>Keep scrolling for the lazy-loaded sequence</h2>
   </section>
-  <section id="section-2">
-		<div id="canvas-container-2" class="apfel-container">
+  <section id="section-2" class="sequence-section">
+		<div id="canvas-container-2" class="apfel-container sticky-container">
   		<canvas class="apfel-sequence" id="canvas-2"></canvas>
     </div>
   </section>
   <section></section>
 </Layout>
+
+<style>
+  .sequence-section {
+    height: 400vh;
+  }
+  .sticky-container {
+    position: sticky;
+    top: 0;
+  }
+</style>
+
 <script>
 import ApfelSequence from "@apfel-sequence/vanilla";
-import { heroAssets, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig, commonDrawMode } from "./../utils/sequenceData"
+import { heroAssets,heroScrollConfig, heroLoadingConfig, section2Assets, section2LoadingConfig, section2ScrollConfig, commonDrawMode } from "./../utils/sequenceData"
 
 const apfelSequenceHero = ApfelSequence({
   canvas: document.querySelector("#canvas"),
   container: document.querySelector("#canvas-container"),
   assetsConfig: heroAssets,
 	loadingConfig: heroLoadingConfig,
+  scrollConfig: heroScrollConfig,
 	drawMode: commonDrawMode,
 });
 

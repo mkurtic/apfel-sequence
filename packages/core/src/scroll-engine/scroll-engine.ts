@@ -14,6 +14,7 @@ export class ScrollEngine {
 	public init(): void {
 		const {
 			containerRef,
+			triggerRef,
 			totalFrames,
 			onFrameChange,
 			start = 'top top',
@@ -21,7 +22,7 @@ export class ScrollEngine {
 			scrub = true
 		} = this.props;
 
-		const element = containerRef;
+		const element = triggerRef || containerRef;
 		if (!element) return;
 
 		this.destroy();
