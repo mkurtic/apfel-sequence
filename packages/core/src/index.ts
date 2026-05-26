@@ -262,7 +262,7 @@ export class ApfelSequenceEngine {
 		};
 	};
 
-	PRELOAD_RATIO = 1 / 10;
+	PRELOAD_RATIO = 1 / 4;
 
 	normalizeLoadingConfig = (loadingConfig?: LoadingConfig): LoadingConfig => {
 		const normalizedTrigger =
