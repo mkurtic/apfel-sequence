@@ -5,6 +5,7 @@ import type { ApfelSequenceProps } from '@apfel-sequence/core';
 
 export type ApfelSequenceReactProps = Omit<ApfelSequenceProps, 'canvas' | 'container'> & {
 	fallbackSrc?: string;
+	className?: string;
 };
 
 const ApfelSequence = (props: ApfelSequenceReactProps) => {
@@ -16,7 +17,8 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 		loadingConfig,
 		clearCacheOnBreakpointChange,
 		alt,
-		fallbackSrc
+		fallbackSrc,
+		className
 	} = props;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -99,7 +101,7 @@ const ApfelSequence = (props: ApfelSequenceReactProps) => {
 	]);
 
 	return (
-		<div className="apfel-container" ref={containerRef}>
+		<div className={`apfel-container ${className || ''}`.trim()} ref={containerRef}>
 			<canvas className="apfel-sequence" ref={canvasRef} aria-label={alt} role="img" />
 			{fallbackSrc && (
 				<noscript>

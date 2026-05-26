@@ -37,6 +37,15 @@ nav .container {
 	padding: 0.5rem 1rem;
 }
 
+.sequence-section {
+	height: 400vh;
+}
+
+.sticky-container {
+	position: sticky;
+	top: 0;
+}
+
 nav .container .left {
 	text-align: left;
 }
