@@ -76,8 +76,8 @@ class FrameLoader {
 					reject(err);
 				};
 
-				// Upgrade priority if needed
-				if (internalPriority === 'high' && existingItem.priority === 'low') {
+				// Bump to front if requested as high priority, even if it was already high
+				if (internalPriority === 'high') {
 					existingItem.priority = 'high';
 					this.queue = this.queue.filter((q) => q !== existingItem);
 					this.queue.unshift(existingItem);
@@ -304,7 +304,7 @@ class FrameLoader {
 		if (!this.activeBreakpoint || this.networkPolicy === 'fallback-only') return;
 
 		const currentFrame = this.firstFrame + frameIndex;
-		const lookaheadFrames = Math.ceil((this.lastFrame - this.firstFrame) / 3);
+		const lookaheadFrames = Math.min(10, Math.ceil((this.lastFrame - this.firstFrame) / 5));
 
 		const startFrame = Math.max(this.firstFrame, currentFrame - lookaheadFrames);
 		const endFrame = Math.min(this.lastFrame, currentFrame + lookaheadFrames);
@@ -333,7 +333,16 @@ class FrameLoader {
 			return true; // keep low priority (sequential background tasks) and valid high priority tasks
 		});
 
+		const framesToLoad: number[] = [];
 		for (let frame = startFrame; frame <= endFrame; frame++) {
+			framesToLoad.push(frame);
+		}
+
+		// Sort by distance to currentFrame, then reverse so the closest frames are unshifted last (making them first in the queue)
+		framesToLoad.sort((a, b) => Math.abs(a - currentFrame) - Math.abs(b - currentFrame));
+		framesToLoad.reverse();
+
+		for (const frame of framesToLoad) {
 			const index = frame - this.firstFrame;
 			if (!this.activeBreakpoint.frames[index]) {
 				this.loadFrame(frame, 'parallel').catch((err) => {
