@@ -441,9 +441,9 @@ describe('FrameLoader', () => {
 			await frameLoader.preloadInitialFrames();
 
 			expect(spy).toHaveBeenCalledTimes(3);
-			expect(spy).toHaveBeenCalledWith(1);
-			expect(spy).toHaveBeenCalledWith(2);
-			expect(spy).toHaveBeenCalledWith(3);
+			expect(spy).toHaveBeenCalledWith(1, 'parallel');
+			expect(spy).toHaveBeenCalledWith(2, 'parallel');
+			expect(spy).toHaveBeenCalledWith(3, 'parallel');
 		});
 	});
 	describe('Mathematical Concurrency & Priority', () => {

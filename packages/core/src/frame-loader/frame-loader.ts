@@ -348,7 +348,11 @@ class FrameLoader {
 		const framesToPreload = Math.min(this.preloadCount, totalFrames);
 
 		for (let i = 0; i < framesToPreload; i++) {
-			await this.loadFrame(this.firstFrame + i);
+			this.loadFrame(this.firstFrame + i, 'parallel').catch((err) => {
+				if (err instanceof Error && err.name !== 'AbortError') {
+					console.error('ApfelSequence:', err);
+				}
+			});
 		}
 	}
 
